@@ -531,9 +531,10 @@ class Handler(BaseHTTPRequestHandler):
         if self.path == '/':
             body = (ROOT / 'web' / 'index.html').read_text(encoding='utf-8').replace('__TOKEN__', self.server.token)
             return self.send(200, body.encode('utf-8'), 'text/html; charset=utf-8')
-        if self.path in {'/app.js', '/style.css'}:
-            content_type = 'text/javascript; charset=utf-8' if self.path.endswith('.js') else 'text/css; charset=utf-8'
-            return self.send(200, (ROOT / 'web' / self.path[1:]).read_bytes(), content_type)
+        if self.path == '/app.js':
+            return self.send(200, (ROOT / 'web' / 'app.js').read_bytes(), 'text/javascript; charset=utf-8')
+        if self.path == '/style.css':
+            return self.send(200, (ROOT / 'web' / 'style.css').read_bytes(), 'text/css; charset=utf-8')
         if self.path == '/poster.pdf' and self.server.last_pdf is not None:
             return self.send(200, self.server.last_pdf, 'application/pdf', Content_Disposition='attachment; filename="amplia-poster.pdf"')
         self.send(404, b'{"ok":false,"erro":{"codigo":"NAO_ENCONTRADO"}}')

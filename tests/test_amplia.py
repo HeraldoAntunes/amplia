@@ -279,6 +279,20 @@ class HTTPTests(Fixture):
             caught.exception.close()
             self.assertEqual(server.engine.state(), before)
 
+    def test_static_routes_use_only_fixed_files(self):
+        server = LocalServer(('127.0.0.1', 0))
+        threading.Thread(target=server.serve_forever, daemon=True).start()
+        self.addCleanup(server.server_close); self.addCleanup(server.shutdown)
+        origin = f'http://127.0.0.1:{server.server_port}'
+        for name in ('app.js', 'style.css'):
+            with urllib.request.urlopen(origin + '/' + name) as response:
+                self.assertEqual(response.read(), (ROOT / 'web' / name).read_bytes())
+        for path in ('/app.js/../amplia.py', '/app.js%2f..%2famplia.py', '/amplia.py'):
+            with self.assertRaises(urllib.error.HTTPError) as caught:
+                urllib.request.urlopen(origin + path)
+            self.assertEqual(caught.exception.code, 404)
+            caught.exception.close()
+
     def test_http_same_commands_and_download(self):
         server = LocalServer(('127.0.0.1', 0))
         thread = threading.Thread(target=server.serve_forever, daemon=True); thread.start()
