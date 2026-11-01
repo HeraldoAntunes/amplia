@@ -6,7 +6,7 @@
 [![Testes](https://github.com/HeraldoAntunes/amplia/actions/workflows/testes.yml/badge.svg)](https://github.com/HeraldoAntunes/amplia/actions/workflows/testes.yml)
 [![CodeQL](https://github.com/HeraldoAntunes/amplia/actions/workflows/codeql.yml/badge.svg)](https://github.com/HeraldoAntunes/amplia/actions/workflows/codeql.yml)
 [![OpenSSF Scorecard](https://api.scorecard.dev/projects/github.com/HeraldoAntunes/amplia/badge)](https://scorecard.dev/viewer/?uri=github.com/HeraldoAntunes/amplia)
-[![Pré-lançamento](https://img.shields.io/github/v/release/HeraldoAntunes/amplia?include_prereleases&label=pr%C3%A9-lan%C3%A7amento)](https://github.com/HeraldoAntunes/amplia/releases/tag/v0.5.0-rc.1)
+[![Pré-lançamento](https://img.shields.io/github/v/release/HeraldoAntunes/amplia?include_prereleases&label=pr%C3%A9-lan%C3%A7amento)](https://github.com/HeraldoAntunes/amplia/releases/tag/v0.5.0-rc.2)
 [![Downloads](https://img.shields.io/github/downloads/HeraldoAntunes/amplia/total?label=downloads)](https://github.com/HeraldoAntunes/amplia/releases)
 [![Licença MIT](https://img.shields.io/badge/licen%C3%A7a-MIT-blue)](LICENSE)
 [![Testado no Windows 11 em VM](https://img.shields.io/badge/testado%20no-Windows%2011%20%28VM%29-0078D6)](#sistemas-e-limitações)
@@ -15,21 +15,21 @@
 Aplicativo livre e offline para Windows, com interface nativa. Escolha uma
 imagem, defina as folhas e imprima ou salve o PDF. Sem conta ou anúncios.
 
-[Baixar para testar](https://github.com/HeraldoAntunes/amplia/releases/tag/v0.5.0-rc.1) ·
+[Baixar para testar](https://github.com/HeraldoAntunes/amplia/releases/tag/v0.5.0-rc.2) ·
 [Guia de uso](docs/GUIA-DE-USO.md) · [Novidades](CHANGELOG.md) ·
 [Comandos](docs/COMANDOS.md) · [Arquitetura](docs/ARQUITETURA.md)
 
 ## Qual arquivo baixar?
 
-**Pré-lançamento 0.5.0-rc.1: versão em desenvolvimento, para testes.**
+**Pré-lançamento 0.5.0-rc.2: versão em desenvolvimento, para testes.**
 **Versão em preparação: 0.5.0**, identificada também no programa como “em teste”.
 Ainda não há versão pública estável. Não use esta candidata como única cópia
 de um trabalho importante. A licença é [MIT](LICENSE), sem garantia.
 
 | Uso | Arquivo |
 | --- | --- |
-| Usar sem instalar, no Windows | [**Amplia-0.5.0-rc.1-portatil.zip**](https://github.com/HeraldoAntunes/amplia/releases/download/v0.5.0-rc.1/Amplia-0.5.0-rc.1-portatil.zip) |
-| Conferir a integridade do download | [SHA256SUMS.txt](https://github.com/HeraldoAntunes/amplia/releases/download/v0.5.0-rc.1/SHA256SUMS.txt) |
+| Usar sem instalar, no Windows | [**Amplia-0.5.0-rc.2-portatil.zip**](https://github.com/HeraldoAntunes/amplia/releases/download/v0.5.0-rc.2/Amplia-0.5.0-rc.2-portatil.zip) |
+| Conferir a integridade do download | [SHA256SUMS.txt](https://github.com/HeraldoAntunes/amplia/releases/download/v0.5.0-rc.2/SHA256SUMS.txt) |
 
 Extraia a pasta completa e abra **Amplia.exe**. Mantenha todos os arquivos juntos.
 O runtime Python está incluído; não é necessário instalar Python para usar o
@@ -37,7 +37,7 @@ portátil. Para quem trabalha com o código, **Iniciar-Amplia.cmd** abre o pacot
 em **dist/Amplia-0.5.0** quando disponível. Ainda não há instalador ou atualização automática.
 
 Para conferir o ZIP, baixe também o SHA256SUMS e execute `certutil -hashfile
-Amplia-0.5.0-rc.1-portatil.zip SHA256` na pasta do download. Compare o resultado
+Amplia-0.5.0-rc.2-portatil.zip SHA256` na pasta do download. Compare o resultado
 com a linha correspondente. Veja [assinatura e segurança](.github/SECURITY.md).
 
 ## O que faz

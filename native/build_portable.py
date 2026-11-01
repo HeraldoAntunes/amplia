@@ -16,7 +16,7 @@ TARGET = ROOT / 'dist' / ('Amplia-' + (ROOT / 'VERSION').read_text(encoding='utf
 
 
 def copy_tree(source, destination):
-    shutil.copytree(source, destination, ignore=shutil.ignore_patterns('__pycache__', '*.pyc', 'test', 'tests', 'idlelib', 'ensurepip', 'turtledemo', 'site-packages'))
+    shutil.copytree(source, destination, ignore=shutil.ignore_patterns('__pycache__', '*.pyc', 'test', 'tests', 'idlelib', 'ensurepip', 'turtledemo', 'pydoc_data', 'venv', 'site-packages'))
 
 
 def copy_documentation(target):

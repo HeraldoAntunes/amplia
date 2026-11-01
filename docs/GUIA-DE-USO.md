@@ -114,3 +114,7 @@ margens e sobreposição do núcleo. Cada página é desenhada separadamente.
 para salvar o arquivo. O PDF preserva a imagem original, sem o raster intermediário
 de 300 dpi da impressão direta. O envio ao Windows não comprova a saída em papel;
 confira a fila de impressão. A qualidade e a cor dependem da impressora e do driver.
+
+O Python incluído serve somente para executar o Amplia. Não é uma instalação
+de desenvolvimento e não inclui os utilitários de ambientes virtuais ou ajuda
+interativa do Python. Para desenvolver, use uma instalação separada de Python.
