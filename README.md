@@ -16,6 +16,7 @@ Imprima ou salve o PDF. Livre, gratuito e sem internet.</p>
   <br>
   <a href="https://github.com/HeraldoAntunes/amplia/actions/workflows/testes.yml"><img src="https://github.com/HeraldoAntunes/amplia/actions/workflows/testes.yml/badge.svg" alt="Testes"></a>
   <a href="https://scorecard.dev/viewer/?uri=github.com/HeraldoAntunes/amplia"><img src="https://api.scorecard.dev/projects/github.com/HeraldoAntunes/amplia/badge" alt="OpenSSF Scorecard"></a>
+  <a href="https://doi.org/10.5281/zenodo.23868491"><img src="https://zenodo.org/badge/DOI/10.5281/zenodo.23868491.svg" alt="DOI"></a>
   <a href="https://github.com/HeraldoAntunes/amplia/releases/tag/v0.6.0-rc.1"><img src="https://img.shields.io/github/v/release/HeraldoAntunes/amplia?include_prereleases&label=pr%C3%A9-lan%C3%A7amento" alt="Pré-lançamento"></a>
   <a href="https://github.com/HeraldoAntunes/amplia/releases"><img src="https://img.shields.io/github/downloads/HeraldoAntunes/amplia/total?label=downloads" alt="Downloads"></a>
 </p>
@@ -228,9 +229,16 @@ Sugestões e correções são bem-vindas. Veja [CONTRIBUTING.md](.github/CONTRIB
 
 ## Como citar
 
-Cite o pré-lançamento e a revisão utilizados. Os dados estão em [CITATION.cff](CITATION.cff); o GitHub oferece
-**Cite this repository** para gerar uma referência. A candidata atual é a
-[0.6.0-rc.1](https://github.com/HeraldoAntunes/amplia/releases/tag/v0.6.0-rc.1).
+O Amplia está arquivado no Zenodo. O **DOI geral**, que reúne as versões, é
+[10.5281/zenodo.23868491](https://doi.org/10.5281/zenodo.23868491).
+
+Para citar a candidata **0.6.0-rc.1**, use o DOI específico
+[10.5281/zenodo.23868492](https://doi.org/10.5281/zenodo.23868492):
+
+> Antunes, H. (2026). *Amplia: pôsteres em folhas A4* (v0.6.0-rc.1) [Software]. Zenodo. https://doi.org/10.5281/zenodo.23868492
+
+Os metadados estão em [CITATION.cff](CITATION.cff); o GitHub oferece **Cite this repository**.
+O DOI identifica o registro arquivado e não muda a situação desta versão, que continua em teste.
 
 ## Como foi feito
 

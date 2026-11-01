@@ -4,6 +4,8 @@ type: software
 title: "Amplia: pôsteres em folhas A4"
 abstract: "Aplicativo local para ampliar imagens, dividir em folhas A4 e exportar PDF para impressão, com interface nativa e comandos JSON."
 version: "0.6.0"
+date-released: "2026-11-01"
+doi: "10.5281/zenodo.23868491"
 authors:
   - given-names: "Heraldo"
     family-names: "Antunes"
@@ -15,3 +17,11 @@ keywords:
   - offline
   - software livre
 repository-code: "https://github.com/HeraldoAntunes/amplia"
+url: "https://doi.org/10.5281/zenodo.23868491"
+identifiers:
+  - type: doi
+    value: "10.5281/zenodo.23868491"
+    description: "DOI geral do Amplia, que reúne as versões no Zenodo"
+  - type: doi
+    value: "10.5281/zenodo.23868492"
+    description: "DOI específico da candidata v0.6.0-rc.1"
