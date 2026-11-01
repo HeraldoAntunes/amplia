@@ -1,0 +1,8 @@
+[
+  {"comando":"imagem.abrir","parametros":{"caminho":"examples/demo.png"}},
+  {"comando":"poster.configurar","parametros":{"largura_mm":370,"altura_mm":544,"margem_mm":10,"sobreposicao_mm":10,"orientacao":"retrato","marcas":true}},
+  {"comando":"folhas.listar"},
+  {"comando":"previa.gerar","parametros":{"caminho":"output/demo-previa.png","pixels":1200,"substituir":true}},
+  {"comando":"previa.gerar","parametros":{"folha":1,"caminho":"output/demo-folha-1.png","pixels":1200,"substituir":true}},
+  {"comando":"pdf.exportar","parametros":{"caminho":"output/amplia-demo.pdf","substituir":true}}
+]

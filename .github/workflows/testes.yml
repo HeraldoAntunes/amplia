@@ -1,0 +1,43 @@
+# Amplia · © 2026 Heraldo Antunes · SPDX-License-Identifier: MIT
+name: Testes
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: testes-${{ github.ref }}
+  cancel-in-progress: true
+jobs:
+  codigo:
+    runs-on: windows-2025
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97 # v7.0.0
+        with:
+          python-version: '3.14.7'
+      - name: Preparar ferramentas do runner
+        run: python -m pip install -r requirements-validado.txt
+      - name: Conferir compilador e montar o portátil
+        shell: pwsh
+        run: |
+          $ErrorActionPreference = 'Stop'
+          foreach ($dir in @('C:\mingw64\bin', 'C:\msys64\ucrt64\bin', 'C:\msys64\mingw64\bin')) {
+            if (Test-Path -LiteralPath "$dir\gcc.exe") { $env:PATH = "$dir;$env:PATH"; break }
+          }
+          python native/build_portable.py
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+      - name: Testar código e interface recolhida
+        run: python -m unittest discover -s tests -v
+      - name: Guardar portátil testado
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        with:
+          name: Amplia-Windows-teste
+          path: dist/Amplia-*/
+          retention-days: 7
+          if-no-files-found: error

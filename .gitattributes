@@ -1,0 +1,13 @@
+* text=auto
+*.py text eol=lf
+*.md text eol=lf
+*.cff text eol=lf
+*.cmd text eol=crlf
+*.png binary
+*.pdf binary
+*.zip binary
+
+*.ico binary
+*.svg text eol=lf
+*.yml text eol=lf
+*.rc.in text eol=lf

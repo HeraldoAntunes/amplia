@@ -1,0 +1,121 @@
+<!doctype html>
+<!-- Amplia · © 2026 Heraldo Antunes · SPDX-License-Identifier: MIT -->
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="amplia-token" content="__TOKEN__">
+  <title>Amplia · Pôster em folhas A4</title>
+  <link rel="stylesheet" href="/style.css">
+  <script src="/app.js" defer></script>
+</head>
+<body>
+  <header><div><span class="wordmark">Amplia<span class="dot">.</span></span><span class="tagline">Uma imagem. Um pôster do seu tamanho.</span></div><span class="local">LOCAL · VERSÃO 0.1</span></header>
+  <main>
+    <aside>
+      <section>
+        <div class="section-title"><span class="step">01</span><h2>Sua imagem</h2></div>
+        <label class="file-button" for="file">Escolher imagem no computador</label>
+        <input id="file" type="file" accept="image/png,image/jpeg,image/webp,image/bmp,image/tiff">
+        <p class="hint">PNG, JPEG, WebP, BMP ou TIFF · até 40 MiB</p>
+        <div id="image-drop" class="image-drop" role="region" aria-label="Área para soltar uma imagem">Ou arraste uma imagem e solte aqui</div>
+        <form id="image-path-form" class="image-path-form"><label for="image-path">Abrir por caminho local</label><input id="image-path" placeholder="C:/Imagens/foto.jpg" autocomplete="off"><button id="open-path" class="secondary" type="submit">Abrir imagem pelo caminho</button></form>
+        <p class="hint">Se a janela de arquivos do Windows não responder, pressione Esc ou Cancelar e use o caminho acima. Caminhos copiados entre aspas também são aceitos.</p>
+        <p id="image-info" class="image-info">Nenhuma imagem aberta.</p>
+      </section>
+      <section>
+        <div class="section-title"><span class="step">02</span><h2>Tamanho e montagem</h2></div>
+        <form id="config-form">
+          <fieldset id="settings" disabled>
+            <div class="fields"><div><label for="width">Largura final <small>mm</small></label><input id="width" type="number" min="10" max="5000" step="any" value="400" required></div><div><label for="height">Altura final <small>mm</small></label><input id="height" type="number" min="10" max="5000" step="any" value="300" required></div></div>
+            <p class="hint">A imagem mantém a proporção e fica centralizada. Dimensões diferentes podem deixar faixas brancas.</p>
+            <label for="orientation">Folhas A4</label><select id="orientation"><option value="retrato">Retrato · 210 × 297 mm</option><option value="paisagem">Paisagem · 297 × 210 mm</option></select>
+            <div class="fields"><div><label for="margin">Margem <small>mm / lado</small></label><input id="margin" type="number" min="0" max="100" step="any" value="10" required></div><div><label for="overlap">Sobreposição <small>mm</small></label><input id="overlap" type="number" min="0" step="any" value="10" required></div></div>
+            <p class="hint">A sobreposição repete uma faixa da imagem para alinhar e colar as folhas.</p>
+            <label class="check"><input id="marks" type="checkbox" checked> Marcas de recorte e número das folhas</label>
+            <button type="submit" class="primary">Aplicar e atualizar prévia</button>
+          </fieldset>
+        </form>
+      </section>
+      <section>
+        <div class="section-title"><span class="step">03</span><h2>PDF para impressão</h2></div>
+        <label for="pdf-path">Salvar no computador</label><input id="pdf-path" value="output/amplia-poster.pdf">
+        <label class="check"><input id="replace" type="checkbox"> Substituir arquivo se já existir</label>
+        <button id="export" class="primary" disabled>Exportar PDF A4</button>
+        <a id="download" hidden>Baixar o PDF exportado</a>
+        <p class="print-note">Na impressão, escolha <strong>100% / tamanho real</strong>. Desative “ajustar à página”.</p>
+        <button id="help-open" class="secondary help-link" aria-controls="assembly-help" aria-expanded="false">Como cortar e montar as folhas</button>
+      </section>
+    </aside>
+    <div class="workspace">
+      <div id="status" role="status" aria-live="polite">Abra uma imagem para começar.</div>
+      <section class="preview-panel">
+        <div class="preview-heading"><div><p class="eyebrow">ANTES DE IMPRIMIR</p><h1>Veja como o pôster será montado</h1></div><select id="view" aria-label="Visualização da prévia" disabled><option value="">Pôster completo</option></select></div>
+        <div id="metrics" class="metrics" hidden><div><strong id="size-metric"></strong><span>tamanho final</span></div><div><strong id="pages-metric"></strong><span>folhas A4</span></div><div><strong id="grid-metric"></strong><span>colunas × linhas</span></div><div><strong id="dpi-metric"></strong><span>resolução efetiva</span></div></div>
+        <div class="stage"><div id="empty"><div class="empty-grid"><i></i><i></i><i></i><i></i></div><h3>Do arquivo à parede</h3><p>Escolha uma imagem, defina o tamanho e monte seu pôster com folhas A4.</p></div><img id="preview" hidden alt="Prévia da divisão do pôster em folhas A4"></div>
+        <div class="preview-footer"><span id="legend">Na visão completa, contornos indicam folhas e faixas verdes indicam sobreposição.</span><span id="warning"></span></div>
+        <button id="help-open-preview" class="text-button help-preview-link" aria-controls="assembly-help" aria-expanded="false">Ver ajuda visual de recorte e montagem</button>
+      </section>
+      <section id="assembly-help" class="assembly-help" hidden aria-labelledby="help-title" tabindex="-1">
+        <div class="help-heading"><div><p class="eyebrow">GUIA DE MONTAGEM</p><h2 id="help-title">Como cortar e montar sem perder imagem</h2></div><button id="help-close" class="secondary" aria-label="Fechar ajuda de montagem">Fechar</button></div>
+        <p id="help-config" class="help-config"></p>
+        <p id="help-intro"></p>
+        <p id="help-single" class="help-note" hidden>O pôster atual cabe em uma folha e não precisa de emendas. O guia abaixo é um exemplo para pôsteres com várias folhas.</p>
+        <div class="help-diagrams" id="overlap-diagrams">
+          <figure id="cut-figure"><figcaption><span>1</span> Corte apenas a margem da folha A</figcaption>
+            <svg viewBox="0 0 400 258" role="img" aria-labelledby="cut-title cut-desc">
+              <title id="cut-title">Recorte da margem direita da folha que fica por cima</title><desc id="cut-desc">A faixa verde contém imagem e deve ser preservada. A faixa branca à direita da linha tracejada vermelha é a margem que deve ser cortada.</desc>
+              <defs><pattern id="paper-hatch" width="8" height="8" patternUnits="userSpaceOnUse"><path d="M0 8L8 0" stroke="#d4b5aa" stroke-width="1"/></pattern></defs>
+              <rect x="35" y="35" width="284" height="169" rx="2" fill="white" stroke="#a6b7aa"/>
+              <rect x="53" y="54" width="225" height="131" fill="#f3f0df"/>
+              <circle cx="246" cy="91" r="24" fill="#c87a4e"/><path d="M53 185L161 82L278 185Z" fill="#39764f"/>
+              <rect x="242" y="54" width="36" height="131" fill="#88af88" fill-opacity=".35"/>
+              <rect x="278" y="54" width="41" height="131" fill="url(#paper-hatch)"/>
+              <path d="M278 24V215" stroke="#ad5039" stroke-width="2.5" stroke-dasharray="7 5"/>
+              <text x="42" y="22" font-size="15" fill="#315e3d">Folha A · fica por cima</text>
+              <path d="M319 110H352V66" fill="none" stroke="#ad5039" stroke-width="1.5"/>
+              <text x="296" y="37" font-size="13" fill="#9b422d">MARGEM</text><text x="320" y="54" font-size="13" fill="#9b422d">cortar</text>
+              <path d="M252 177L223 221H120" fill="none" stroke="#315e3d" stroke-width="1.5"/>
+              <text x="40" y="242" font-size="15" fill="#315e3d">Faixa de imagem: preservar</text>
+            </svg>
+            <p id="help-cut"></p>
+          </figure>
+          <figure><figcaption><span>2</span> Alinhe a imagem repetida da folha B</figcaption>
+            <svg viewBox="0 0 400 258" role="img" aria-labelledby="join-title join-desc">
+              <title id="join-title">Folha A recortada por cima da faixa repetida da folha B</title><desc id="join-desc">A folha B fica por baixo. As duas cópias da faixa de imagem coincidem na sobreposição; o desenho segue contínuo na emenda.</desc>
+              <defs><clipPath id="back-sheet-clip"><rect x="224" y="54" width="130" height="131"/></clipPath><clipPath id="front-sheet-clip"><rect x="46" y="54" width="214" height="131"/></clipPath></defs>
+              <rect x="204" y="35" width="168" height="169" fill="white" stroke="#a6b7aa"/>
+              <g clip-path="url(#back-sheet-clip)"><rect x="46" y="54" width="308" height="131" fill="#f3f0df"/><path d="M46 185L153 82L278 185Z" fill="#39764f"/><circle cx="242" cy="91" r="24" fill="#c87a4e"/></g>
+              <rect x="28" y="35" width="232" height="169" fill="white" stroke="#a6b7aa"/>
+              <g clip-path="url(#front-sheet-clip)"><rect x="46" y="54" width="308" height="131" fill="#f3f0df"/><path d="M46 185L153 82L278 185Z" fill="#39764f"/><circle cx="242" cy="91" r="24" fill="#c87a4e"/></g>
+              <rect x="224" y="54" width="36" height="131" fill="#88af88" fill-opacity=".25"/>
+              <path d="M260 35V204" stroke="#315e3d" stroke-width="1.5"/>
+              <text x="35" y="22" font-size="15" fill="#315e3d">A por cima</text><text x="266" y="22" font-size="15" fill="#315e3d">B por baixo</text>
+              <path d="M224 216H260M224 211V221M260 211V221" stroke="#315e3d" stroke-width="1.5"/>
+              <text id="help-band-label" x="38" y="242" font-size="15" fill="#315e3d">Imagem repetida: alinhar, não remover</text>
+            </svg>
+            <p id="help-align"></p>
+          </figure>
+        </div>
+        <div id="edge-diagram" hidden>
+          <svg viewBox="0 0 400 180" role="img" aria-labelledby="edge-title edge-desc"><title id="edge-title">União sem sobreposição</title><desc id="edge-desc">Duas bordas de imagem se encontram diretamente, sem faixa repetida para alinhamento.</desc><rect x="30" y="30" width="170" height="110" fill="#f3f0df" stroke="#a6b7aa"/><rect x="200" y="30" width="170" height="110" fill="#f3f0df" stroke="#a6b7aa"/><path d="M30 140L160 45L290 140Z" fill="#39764f"/><path d="M200 25V145" stroke="#315e3d" stroke-width="2"/><text x="48" y="20" font-size="14" fill="#315e3d">Folha A</text><text x="280" y="20" font-size="14" fill="#315e3d">Folha B</text><text x="42" y="168" font-size="15" fill="#315e3d">Borda a borda: sem faixa repetida</text></svg>
+          <p id="help-edge-text"></p>
+        </div>
+        <p class="help-scale">Esquemas didáticos, sem escala. Os tons verdes explicam a montagem e não são impressos sobre a imagem.</p>
+        <p id="help-example" class="help-example"></p>
+        <ol id="help-steps"></ol>
+        <div class="help-care"><strong>Para preservar o desenho</strong><ul id="help-care-list"></ul></div>
+        <p id="help-preview-note" class="hint"></p>
+      </section>
+      <section class="commands-panel">
+        <div class="command-heading"><div><p class="eyebrow">TAMBÉM POR COMANDOS</p><h2>O mesmo fluxo, acessível à IA</h2></div><button id="catalog" class="secondary">Consultar comandos</button></div>
+        <p class="hint">Envie um comando JSON. A interface e o terminal usam o mesmo núcleo de operações.</p>
+        <form id="command-form"><label for="command">Comando JSON</label><div class="command-input"><textarea id="command" spellcheck="false" rows="3">{"comando":"estado.obter"}</textarea><button type="submit" class="secondary">Executar</button></div></form>
+        <details id="response-details"><summary>Retorno estruturado da última operação</summary><pre id="response">{}</pre></details>
+        <button id="reset" class="text-button">Reiniciar sessão</button>
+      </section>
+    </div>
+  </main>
+  <footer>Amplia · processamento local, sem envio de imagens à internet.</footer>
+</body>
+</html>
