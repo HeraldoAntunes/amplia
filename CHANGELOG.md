@@ -2,6 +2,13 @@
 
 ## Em desenvolvimento
 
+## 0.6.0 · Em preparação
+
+- Dois modos de montagem sem tesoura: dobrar margens para trás ou unir folhas inteiras com faixas brancas.
+- Identificação por linha e coluna, vizinhos e guias de união nas folhas impressas.
+- Prévia e instruções específicas para a forma de montagem escolhida.
+- Mapa de montagem em PDF separado das folhas do pôster.
+
 ## 0.5.0 — Em preparação
 
 - Abas Imagem, Folhas e Imprimir / PDF, sem números que se confundam com a quantidade de folhas.

@@ -19,7 +19,7 @@ function showState(state) {
   $('width').value = Number(cfg.largura_mm.toFixed(3));
   $('height').value = Number(cfg.altura_mm.toFixed(3));
   $('margin').value = cfg.margem_mm; $('overlap').value = cfg.sobreposicao_mm;
-  $('orientation').value = cfg.orientacao; $('marks').checked = cfg.marcas;
+  $('assembly').value = cfg.montagem; $('orientation').value = cfg.orientacao; $('marks').checked = cfg.marcas;
   const loaded = Boolean(state.imagem);
   $('settings').disabled = !loaded; $('export').disabled = !loaded; $('view').disabled = !loaded;
   $('metrics').hidden = !loaded; $('empty').hidden = loaded; $('preview').hidden = !loaded;
@@ -40,7 +40,7 @@ function showState(state) {
 function showPreview(result) {
   $('preview').src = `data:image/png;base64,${result.dados_base64}`;
   $('preview').hidden = false;
-  $('legend').textContent = result.folha ? 'Folha A4 com margens e marcas. Áreas brancas ao final não devem ser ampliadas na impressão.' : 'Contornos indicam folhas; faixas verdes indicam sobreposição. As marcações verdes não aparecem no PDF.';
+  $('legend').textContent = result.folha ? 'Folha A4 com margens e marcas. Áreas brancas ao final não devem ser ampliadas na impressão.' : result.folhas.montagem === 'inteiras' ? 'Folhas inteiras com as faixas brancas da montagem.' : 'Contornos indicam folhas; faixas verdes indicam sobreposição. As marcações verdes não aparecem no PDF.';
 }
 async function preview() {
   const args = {pixels: 1200};
@@ -60,16 +60,8 @@ function renderHelp(help, focus = false) {
   const fmt = value => value.toLocaleString('pt-BR', {maximumFractionDigits: 3});
   $('help-title').textContent = help.titulo;
   $('help-config').textContent = `Configuração aplicada: margem ${fmt(cfg.margem_mm)} mm · sobreposição ${fmt(cfg.sobreposicao_mm)} mm · A4 ${cfg.orientacao}`;
-  $('help-intro').textContent = cfg.sobreposicao_mm ? 'A faixa entre folhas contém imagem repetida. Ela permite alinhar a montagem sem perder partes do desenho.' : 'A sobreposição aplicada é zero. Não há imagem repetida para ajustar: a união será borda a borda.';
+  $('help-intro').textContent = help.montagem === 'inteiras' ? 'Encoste os lados do papel sem sobrepor. As faixas brancas ficam visíveis.' : cfg.sobreposicao_mm ? 'A faixa entre folhas contém imagem repetida. Ela permite alinhar a montagem sem perder partes do desenho.' : 'A sobreposição aplicada é zero. Não há imagem repetida para ajustar: a união será borda a borda.';
   $('help-single').hidden = !help.folha_unica;
-  $('overlap-diagrams').hidden = help.modo !== 'sobrepor';
-  $('edge-diagram').hidden = help.modo !== 'borda_a_borda';
-  $('cut-figure').hidden = cfg.margem_mm === 0;
-  $('overlap-diagrams').classList.toggle('single-diagram', cfg.margem_mm === 0);
-  $('help-cut').textContent = help.passos[1].texto;
-  $('help-align').textContent = help.passos[2].texto;
-  $('help-edge-text').textContent = `${help.passos[1].texto} ${help.passos[2].texto}`;
-  $('help-band-label').textContent = `Faixa repetida: ${fmt(cfg.sobreposicao_mm)} mm na impressão`;
   const example = help.exemplo_horizontal_mm;
   $('help-example').textContent = cfg.sobreposicao_mm ? `Exemplo horizontal para este A4: a primeira folha imprime de 0 a ${fmt(example.primeira_folha[1])} mm do pôster; a segunda começa em ${fmt(example.segunda_comeca)} mm. O trecho de ${fmt(example.faixa_repetida[0])} a ${fmt(example.faixa_repetida[1])} mm aparece nas duas folhas.` : `Exemplo horizontal: a primeira folha termina em ${fmt(example.primeira_folha[1])} mm e a segunda começa no mesmo ponto, sem faixa repetida. Para ter uma faixa de ajuste, aplique sobreposição maior que zero.`;
   $('help-steps').replaceChildren(...help.passos.map(step => {
@@ -142,7 +134,7 @@ document.addEventListener('drop', event => {
   if (!$('image-drop').contains(event.target) && !pending) status('Solte a imagem na área marcada ao lado de “Sua imagem”.');
 });
 $('config-form').addEventListener('submit', event => { event.preventDefault(); run(async () => {
-  const args = {largura_mm: Number($('width').value), altura_mm: Number($('height').value), margem_mm: Number($('margin').value), sobreposicao_mm: Number($('overlap').value), orientacao: $('orientation').value, marcas: $('marks').checked};
+  const args = {largura_mm: Number($('width').value), altura_mm: Number($('height').value), margem_mm: Number($('margin').value), sobreposicao_mm: Number($('overlap').value), orientacao: $('orientation').value, montagem: $('assembly').value, marcas: $('marks').checked};
   showState(await command('poster.configurar', args));
   $('download').hidden = true;
   await preview(); await refreshHelp(); status('Configuração aplicada. Confira o pôster completo ou cada folha A4.');

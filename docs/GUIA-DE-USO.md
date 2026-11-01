@@ -29,8 +29,8 @@ quantidade de folhas atualiza a prévia automaticamente após uma pequena pausa.
 Confira os contornos, as faixas de sobreposição e o tamanho final em centímetros.
 
 **Por medidas (mm)** permite informar largura e altura. Em **Ajustes de impressão…**
-ficam a borda branca, a faixa para colar e as marcas de corte; a posição do A4
-é escolhida em **Posição das folhas A4**. O padrão usa 10 mm de margem e
+ficam a borda branca, a faixa repetida do modo com dobra e as guias de montagem; a posição do A4
+é escolhida em **Posição das folhas A4**. O padrão usa o modo com dobra e 10 mm de margem e
 sobreposição. Clique em **Atualizar prévia** para aplicar medidas e ajustes
 avançados. Mudanças precisam estar aplicadas antes de imprimir ou salvar o PDF.
 A imagem fica inteira e centralizada; pode haver espaços brancos se a grade
@@ -46,37 +46,74 @@ e pede confirmação antes de substituir um arquivo existente.
 Imprima em **100% / tamanho real**, sem ajustar à página.
 A sessão não é salva como projeto; guarde o PDF antes de fechar.
 
-## Recortar e montar as folhas
+## Montar sem recortar
 
+Escolha o modo em **Folhas → Montagem sem recortar**, antes de imprimir. Trocar o
+modo muda a divisão da imagem e pode mudar o tamanho do desenho. Não misture
+folhas impressas em modos ou configurações diferentes.
 
-Na interface, use **Ajuda → Como montar as folhas** ou pressione **F1**.
-O painel mostra o recorte da margem da folha de cima e a folha vizinha por
-baixo, com a imagem repetida alinhada. Os desenhos são didáticos, sem escala,
-e as medidas seguem a configuração aplicada. A ajuda também funciona antes
-de abrir uma imagem. **Voltar à prévia** fecha essa visualização.
+Cada folha traz um código: **A1, A2, A3...** na primeira linha; **B1, B2, B3...**
+na segunda. A letra é a linha e o número é a coluna. O número de impressão,
+como **FOLHA 2/6**, aparece junto. A indicação **CIMA** ajuda a manter todas
+as folhas na orientação correta. Imprima em uma face, sem frente e verso.
 
-Ao aplicar outra configuração, o painel aberto é atualizado. Com margem zero, não manda aparar uma margem inexistente; com sobreposição zero, mostra a união borda a borda. O comando JSON correspondente é `{"comando":"ajuda.montagem"}`. Para fechar o painel pelo console, use `{"comando":"ajuda.montagem","parametros":{"exibir":false}}`.
+### Dobrar bordas para trás
 
-**A sobreposição preserva a continuidade da imagem nas emendas:** uma faixa do desenho é impressa nas duas folhas vizinhas. Na prévia geral, as faixas verdes destacam essa repetição e os contornos mostram os limites das folhas. Essas marcações verdes e os números sobre o desenho não entram no PDF. Quando habilitadas, as marcas de recorte e a identificação das folhas são impressas nas margens.
+Este modo procura manter o desenho contínuo. Use uma régua para ajudar na dobra.
 
-Margem e sobreposição têm funções diferentes. A **margem** reserva espaço nas bordas do papel, fora do retângulo do pôster impresso naquela folha. A **sobreposição** contém imagem repetida para alinhar e colar as folhas. Não é um intervalo vazio nem uma parte descartada pelo programa.
+1. Organize todas as folhas conforme os códigos, sem colar ainda. Comece por A1.
+2. Nas folhas da segunda coluna em diante, dobre **somente a margem esquerda
+   para trás**, pela linha tracejada. Não dobre a borda externa esquerda do cartaz.
+3. Coloque A2 **por cima** de A1. A borda dobrada de A2 deve coincidir com os sinais
+   **+** de A1. Confira se os traços repetidos do desenho coincidem antes de fixar.
+4. Continue a linha: A3 por cima de A2, e assim por diante. Fixe provisoriamente
+   com fita pelo verso; mantenha os lados horizontais alinhados.
+5. Prepare a linha B. Dobre para trás também sua **margem de cima**, na linha
+   tracejada. Coloque a linha B **por cima** da A, alinhando os sinais laterais
+   **+** e os traços do desenho. Repita para as próximas linhas.
+6. Confira todas as emendas. Fixe com fita pelo verso; se usar cola, aplique pouca
+   quantidade na área escondida, depois de alinhar.
 
-Com margem e sobreposição de 10 mm, a área útil horizontal do A4 em retrato é de 190 mm. A primeira folha imprime o trecho de 0 a 190 mm do pôster; a segunda começa em 180 mm. Portanto, os 10 mm entre 180 e 190 mm aparecem nas duas folhas. Um desenho que atravessa essa emenda fica completo depois do alinhamento.
+**Tracejado significa dobra; + significa alinhamento.** Não corte. Não dobre
+brancos que fazem parte da imagem ou da centralização. Não dobre as bordas
+externas do cartaz. A faixa de imagem repetida é intencional: fica por baixo
+da folha nova e ajuda a alinhar. As dobras e a espessura do papel ainda podem
+ficar perceptíveis. Com margem zero não há borda reservada para dobrar;
+com sobreposição zero não há faixa repetida para ajuste.
 
-Para montar:
+### Folhas inteiras, com faixas brancas
 
-1. Imprima todas as páginas em **100% / tamanho real**, sem ajustar à página. Se usar o exemplo de calibração, confira com uma régua se a linha indicada mede 100 mm.
-2. Organize as folhas pelos números, linhas e colunas, antes de cortar ou colar. Confira também a prévia individual de cada folha.
-3. Monte uma linha por vez. Se a folha à esquerda ficar por cima da vizinha, corte somente sua **margem branca direita**, no limite indicado pelas marcas de recorte. Preserve a faixa de imagem repetida da folha à direita, que ficará por baixo.
-4. Deslize a folha de baixo até que os traços do desenho coincidam na sobreposição. Fixe provisoriamente e confira o alinhamento antes de colar.
-5. Para unir as linhas, siga o mesmo princípio: apare a margem branca inferior da linha que ficará por cima e alinhe a faixa repetida da linha seguinte por baixo.
+Este modo evita tanto a tesoura quanto as dobras. As faixas brancas fazem parte
+do resultado e aparecem na prévia.
 
-**Não remova a faixa de sobreposição das duas folhas.** As marcas de recorte indicam o limite do retângulo impresso naquela folha; não mandam eliminar toda a imagem repetida. Também não corte automaticamente áreas brancas que pertençam ao próprio desenho ou às faixas de centralização do pôster.
+1. Organize A1, A2, A3... e depois B1, B2, B3... como no mapa.
+2. Encoste os lados do **papel**, sem sobrepor. Não procure coincidir desenhos
+   por cima de outra folha: cada trecho da imagem aparece uma única vez.
+3. Não corte nem dobre. Una as folhas com fita pelo verso, sem cobrir o desenho.
 
-Com sobreposição igual a zero, não existe faixa repetida para ajuste: as bordas precisam se encontrar diretamente depois do recorte das margens internas. Para a montagem com faixa de alinhamento, configure uma sobreposição maior que zero; o padrão do Amplia é 10 mm.
+Com margem de 10 mm por lado, duas folhas vizinhas deixam uma faixa branca de
+**20 mm** entre os desenhos. A repetição fica desativada neste modo. O tamanho
+**do desenho** é a soma das áreas úteis; o **papel montado** inclui as margens
+e pode ser maior. A última folha pode conter espaço branco adicional quando
+as medidas escolhidas não completam uma área útil inteira.
 
-O alinhamento correto evita perder partes do desenho, mas a emenda física do papel ainda pode ficar visível. A montagem e a medida final em papel continuam pendentes de validação por impressão física.
+### Mapa de montagem e conferência
 
+Em **Imprimir / PDF**, **Salvar mapa de montagem (PDF)** cria um arquivo com
+sufixo **-mapa.pdf**, separado do PDF do pôster. Ele contém a grade, os códigos,
+a ordem e as instruções do modo aplicado. Pode ser impresso pelo seu leitor
+PDF. Não cole essa folha ao cartaz. Salvar o mapa não salva o pôster.
+
+**Ajuda → Como montar as folhas** ou **F1** mostra as mesmas orientações.
+As guias e os códigos saem em preto nas margens quando **Guias de montagem e
+códigos das folhas** está habilitado. O verde do modo com dobra pertence só
+à prévia; não é impresso sobre o desenho. Mantenha pelo menos os 10 mm de
+borda padrão; se a impressora não alcançar as guias, aumente essa borda.
+Na impressão direta, o Amplia confere também se as guias cabem na área imprimível.
+
+A geometria e a impressão virtual são verificadas separadamente da experiência
+em papel. A primeira impressão da versão anterior revelou montagem confusa;
+os novos modos continuam em teste até a conferência física de clareza e alinhamento.
 
 ## Sobre e comandos
 
@@ -88,13 +125,13 @@ Veja o [contrato de comandos](COMANDOS.md).
 ## Limites e perguntas comuns
 
 - **Há instalador?** Esta preparação oferece somente a pasta portátil.
-- **Procura atualizações?** Não há consulta automática nem endereço de publicação.
-- **Funciona em outro sistema?** A validação atual foi feita no Windows desta máquina;
-  não há validação em Linux, macOS ou outro computador.
+- **Procura atualizações?** Não há consulta automática. As candidatas estão no GitHub, no endereço informado no README.
+- **Funciona em outro sistema?** A validação automatizada usa Windows 11 em VM e Windows Server 2025 na CI;
+  Linux, macOS e outro computador físico continuam pendentes.
 - **A ampliação ficou borrada?** A qualidade depende da resolução da imagem.
   O comando de estado informa a resolução efetiva e avisos abaixo de 100 dpi.
 - **Posso fechar e retomar?** A sessão fica na memória; não há recuperação automática.
-- **As emendas já foram testadas no papel?** A impressão física continua pendente.
+- **As emendas já foram testadas no papel?** A montagem anterior foi considerada confusa; os novos modos aguardam conferência física.
 
 ## Imprimir diretamente
 

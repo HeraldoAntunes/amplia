@@ -81,3 +81,10 @@ class PrintTests(unittest.TestCase):
             result = self.engine.execute({'comando': 'poster.imprimir'})
         self.assertFalse(result['ok'])
         self.assertEqual(result['erro']['detalhes']['motivo'], 'Selecione A4.')
+
+    def test_driver_must_preserve_assembly_guides_as_well_as_image(self):
+        caps = [300, 300, 2480, 3508, 83, 83, 2314, 3342]
+        with self.assertRaisesRegex(ValueError, 'guias de montagem'):
+            page_geometry(self.engine.layout(), caps)
+        self.engine.config['marcas'] = False
+        page_geometry(self.engine.layout(), caps)

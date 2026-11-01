@@ -34,7 +34,7 @@ eles podem estar sendo usados por scripts de impressão.
 ## Paginação
 
 O papel A4 tem margens uniformes. O avanço é a área útil menos a sobreposição.
-Uma faixa da imagem aparece nas duas folhas vizinhas; a escala é igual em
+No modo com dobra, uma faixa da imagem aparece nas duas folhas vizinhas; a escala é igual em
 todas as páginas. A imagem é encaixada inteira no retângulo escolhido, sem
 distorção ou corte automático. O PDF usa milímetros convertidos para pontos.
 
@@ -56,3 +56,14 @@ a 300 dpi, sem bitmap do pôster inteiro. Os milímetros são convertidos pelos
 dpi do driver e compensados pelos deslocamentos físicos, sem ajustar à área útil.
 Falhas após StartDoc abortam o trabalho; contexto e memória do diálogo são liberados.
 Nenhum visualizador PDF, navegador, pacote novo ou serviço de rede é necessário.
+
+## Dois modos de união
+
+`montagem` é validada no catálogo e aplicada antes de calcular a grade. No modo
+`inteiras`, a repetição efetiva é zero; no modo `dobrar`, usa a preferência
+`sobreposicao_mm`. Cada folha retorna código, bordas a dobrar e origem física
+do papel. A prévia de folhas inteiras reaproveita o render de cada página.
+`print_marks` fornece as mesmas posições e instruções para a saída PDF vetorial
+e o raster da impressão direta. Nenhum guia cobre a imagem. O driver é validado
+também contra o espaço necessário às letras e sinais. O mapa tem PDF próprio,
+sem alterar índices, intervalos ou contagem de impressão do pôster.

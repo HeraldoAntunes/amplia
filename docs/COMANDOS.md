@@ -18,10 +18,10 @@ Falhas de abertura ou configuração mantêm o estado anterior. Arquivos são gr
 
 - **comandos.listar:** consulta o catálogo de parâmetros e efeitos.
 - **estado.obter:** consulta imagem, configuração, resolução efetiva e folhas atuais.
-- **ajuda.montagem:** devolve orientações estruturadas, conceitos, cuidados, passos e exemplo numérico de recorte e alinhamento para a configuração aplicada. Funciona sem imagem e não altera o estado. Na interface, exibir (booleano, padrão true) abre o painel; exibir:false o fecha. O terminal apenas retorna essa preferência e as orientações. Margem zero e sobreposição zero recebem instruções próprias.
+- **ajuda.montagem:** devolve orientações estruturadas, conceitos, cuidados, passos e exemplo numérico de dobra ou união de folhas inteiras para a configuração aplicada. Funciona sem imagem e não altera o estado. Na interface, exibir (booleano, padrão true) abre o painel; exibir:false o fecha. O terminal apenas retorna essa preferência e as orientações. Margem zero e sobreposição zero recebem instruções próprias.
 - **imagem.abrir:** exige exatamente um entre caminho e dados_base64. Base64 sem prefixo data URL; nome opcional. Normaliza orientação EXIF e compõe transparência sobre branco. Abrir outra imagem inicia sua configuração padrão.
-- **poster.configurar:** aceita tamanho por `colunas` e `linhas` (inteiros positivos, sempre juntos) ou por `largura_mm` e/ou `altura_mm`. Não misture contagens e medidas no mesmo pedido. Margem, sobreposição, orientação e marcas continuam opcionais. Uma grade permanece fixa ao mudar orientação, margem ou sobreposição; as medidas são recalculadas. Informar uma medida volta ao modo por mm. Somente largura ou altura deriva a outra dimensão pela proporção da imagem. A imagem inteira é centralizada sem distorção ou corte; podem aparecer faixas brancas. orientacao aceita retrato ou paisagem. Valida tudo antes de aplicar.
-- **folhas.listar:** consulta papel, área útil, linhas, colunas e retângulos de cada folha. Não grava arquivos.
+- **poster.configurar:** aceita tamanho por `colunas` e `linhas` (inteiros positivos, sempre juntos) ou por `largura_mm` e/ou `altura_mm`. Não misture contagens e medidas no mesmo pedido. Margem, sobreposição, orientação, montagem e marcas continuam opcionais. `montagem` aceita `dobrar` (padrão) ou `inteiras`. Uma grade permanece fixa ao mudar orientação, margem ou sobreposição; as medidas são recalculadas. Informar uma medida volta ao modo por mm. Somente largura ou altura deriva a outra dimensão pela proporção da imagem. A imagem inteira é centralizada sem distorção ou corte; podem aparecer faixas brancas. orientacao aceita retrato ou paisagem. Valida tudo antes de aplicar.
+- **folhas.listar:** consulta papel, área útil, linhas, colunas e retângulos de cada folha. Retorna também `codigo`, `dobras`, posições físicas `papel_x_mm`/`papel_y_mm`, `papel_montado_mm`, `montagem` e `faixa_branca_interna_mm`. Não grava arquivos.
 - **previa.gerar:** retorna PNG em dados_base64, dimensões e paginação. folha opcional seleciona uma página A4; omitida mostra mosaico. pixels define a maior dimensão, entre 200 e 2400, padrão 1200. caminho opcional salva .png; substituir é false por padrão. Faixas verdes são apenas indicação da prévia geral e não aparecem no PDF.
 - **pdf.exportar:** exige caminho terminado em .pdf; substituir é false por padrão. Retorna caminho, páginas, bytes e SHA-256. HTTP acrescenta download_url para baixar os mesmos bytes no navegador. Exporta todas as folhas em tamanho A4 físico, com marcas se habilitadas.
 - **sessao.reiniciar:** descarta o estado em memória, sem apagar os arquivos exportados.
@@ -58,13 +58,35 @@ Para pôster de largura L e altura A, colunas = max(1, ceil((L-s)/(u-s))) e linh
 
 Exemplo: margem de 10 mm e sobreposição de 10 mm deixam área útil de 190 × 277 mm e avanços de 180 × 267 mm. O pôster de 370 × 544 mm usa quatro folhas com origens (0,0), (180,0), (0,267) e (180,267). A imagem recebe a mesma escala em todas as páginas, que recortam apenas seu retângulo. Isso mantém a continuidade nas emendas e evita ampliar a última folha.
 
-## Sobreposição e montagem
+## Montagem sem recorte
 
-O parâmetro sobreposicao_mm define uma faixa de **imagem repetida**, não um espaço branco entre páginas. No exemplo acima, a primeira coluna contém o trecho horizontal de 0 a 190 mm e a segunda começa em 180 mm: o intervalo de 180 a 190 mm é impresso nas duas folhas. A mesma regra vale para as linhas, na vertical.
+`montagem: "dobrar"` mantém a faixa definida por `sobreposicao_mm`. A folha nova
+fica por cima da anterior, dobrando para trás a margem esquerda a partir da
+segunda coluna e a margem superior a partir da segunda linha. As guias `+`
+ficam na folha anterior, exatamente onde chega a borda dobrada da vizinha.
+O campo `dobras` de cada folha identifica somente essas bordas internas.
 
-A prévia geral destaca a repetição em verde; essa indicação e os números sobre o desenho não entram no PDF. Com marcas:true, o PDF acrescenta marcas de recorte e identificação nas margens. Essas marcas delimitam o retângulo impresso e não indicam que toda a faixa repetida deva ser removida.
+`montagem: "inteiras"` usa sobreposição efetiva zero na paginação. A preferência
+`sobreposicao_mm` continua guardada na configuração para uma futura volta ao
+modo com dobra; `folhas.sobreposicao_mm` informa o valor realmente aplicado.
+As áreas úteis se repartem sem repetir a imagem. A prévia geral posiciona os
+papéis inteiros encostados e mostra as margens brancas reais. Uma grade C × R
+usa desenho de C × u por R × v; o papel montado mede C × largura A4 por
+R × altura A4. Entre desenhos, a faixa branca interna mede duas margens.
 
-Na montagem, a margem interna da folha que ficará por cima é aparada, e a imagem repetida da vizinha fica por baixo para alinhamento. Não se deve eliminar a faixa repetida das duas folhas. Com sobreposicao_mm igual a zero, a união é feita borda a borda, sem essa faixa de ajuste. O procedimento completo está em [Recortar e montar as folhas](GUIA-DE-USO.md#recortar-e-montar-as-folhas).
+Nos dois modos, `poster_mm` descreve o retângulo do desenho; `papel_montado_mm`
+descreve o retângulo dos papéis, incluindo bordas externas e sobras da última
+folha. A1, A2... identificam a primeira linha; B1, B2... a segunda. O número de
+impressão permanece em `numero`. Com `marcas:true`, códigos, vizinhos e ações
+são impressos em preto, fora da imagem. Os contornos verdes da prévia não são
+impressos sobre a arte.
+
+**mapa.exportar** aceita `caminho` terminado em `.pdf` e `substituir` opcional.
+Salva uma página A4 com grade e instruções do modo aplicado. Não muda a sessão,
+não aumenta o número de folhas do pôster e não marca o pôster como salvo.
+Exemplo: `{"comando":"mapa.exportar","parametros":{"caminho":"output/cartaz-mapa.pdf"}}`.
+
+Veja [Montar sem recortar](GUIA-DE-USO.md#montar-sem-recortar).
 
 ## HTTP local
 

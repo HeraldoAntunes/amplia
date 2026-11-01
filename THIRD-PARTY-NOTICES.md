@@ -64,3 +64,8 @@ Não usam logotipo de outro produto nem uma fonte incorporada.
 PyMuPDF e pypdf são ferramentas locais de teste; não integram o portátil nem
 os arquivos distribuídos ao usuário. A licença de ferramentas de desenvolvimento
 não deve ser anunciada como licença do código próprio.
+
+A bandeira do Brasil no README usa o arquivo em domínio público
+[Flag of Brazil.svg](https://commons.wikimedia.org/wiki/File:Flag_of_Brazil.svg),
+do Wikimedia Commons, sem alterações no desenho. A proporção e as cores do
+arquivo são preservadas. Ela não é o ícone do programa.

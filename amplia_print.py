@@ -45,6 +45,8 @@ def page_geometry(layout, caps):
                (height - offset_y - printable_h) * 25.4 / dpi_y]
     if max(borders) > layout['margem_mm'] + .3:
         raise ValueError('A impressora exige margem maior. Aumente a borda branca nos ajustes de impressão.')
+    if layout.get('marcas') and max(borders) > layout['margem_mm'] - layout['recuo_guias_mm'] + .3:
+        raise ValueError('A impressora cortaria as guias de montagem. Aumente a borda branca nos ajustes de impressão.')
     return (-offset_x, -offset_y,
             round(expected_w * dpi_x / 25.4) - offset_x,
             round(expected_h * dpi_y / 25.4) - offset_y)

@@ -163,6 +163,37 @@ class UsabilityTests(unittest.TestCase):
         question.assert_called_once()
         self.assertFalse(self.app.closing)
 
+    def test_assembly_choice_changes_preview_and_printed_layout(self):
+        self.open_image()
+        self.app.assembly_mode.set('Folhas inteiras (faixas brancas)')
+        self.app.orientation_changed(); self.wait()
+        self.assertEqual(self.app.engine.config['montagem'], 'inteiras')
+        self.assertEqual(self.app.engine.layout()['poster_mm'], [380, 554])
+        self.assertIn('faixas brancas', self.app.legend.cget('text'))
+        self.assertIn('Papel montado:', self.app.pdf_summary.get())
+        self.app.assembly_mode.set('Dobrar bordas para trás')
+        self.app.orientation_changed(); self.wait()
+        self.assertEqual(self.app.engine.layout()['poster_mm'], [370, 544])
+        self.assertIn('por cima', self.app.assembly_hint.get())
+
+    def test_save_map_preserves_unsaved_poster_and_uses_separate_name(self):
+        self.open_image(); self.app.go_pdf()
+        self.app.output_folder.set(str(self.folder)); self.app.output_name.set('cartaz.pdf')
+        self.app.export_pdf(mapa=True); self.wait()
+        self.assertEqual(len(PdfReader(self.folder/'cartaz-mapa.pdf').pages), 1)
+        self.assertFalse((self.folder/'cartaz.pdf').exists())
+        self.assertTrue(self.app.unsaved)
+        self.assertIn('Mapa salvo', self.app.status.get())
+
+    def test_advanced_apply_button_fits_in_default_window(self):
+        self.open_image()
+        self.root.geometry('1160x740')
+        self.root.deiconify(); self.root.update()
+        self.app.steps.select(1); self.app.toggle_advanced(); self.root.update()
+        button = self.app.apply_button
+        self.assertLessEqual(button.winfo_y() + button.winfo_height(), self.app.size_page.winfo_height())
+        self.assertTrue(button.winfo_ismapped())
+
 
 if __name__=='__main__':
     unittest.main(verbosity=2)

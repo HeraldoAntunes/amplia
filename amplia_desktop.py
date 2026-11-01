@@ -38,47 +38,39 @@ def initial_geometry(root):
 
 
 def assembly_diagram(help_data):
-    """Esquema próprio; a arte repetida é recortada da mesma imagem nas duas folhas."""
+    """Esquema didático próprio; posições e dimensões são ilustrativas."""
     image = Image.new('RGB', (1000, 330), '#f7faf5')
     draw = ImageDraw.Draw(image)
-    def font(size, bold=False):
-        path = Path('C:/Windows/Fonts') / ('segoeuib.ttf' if bold else 'segoeui.ttf')
+    def font(size):
+        path = Path('C:/Windows/Fonts/segoeui.ttf')
         return ImageFont.truetype(str(path), size) if path.exists() else ImageFont.load_default(size=size)
-    if help_data['modo'] == 'borda_a_borda':
-        draw.text((35, 20), 'Sem sobreposição: unir borda a borda', font=font(25, True), fill=GREEN)
-        draw.rectangle((220, 85, 500, 245), fill='#f3efdc', outline='#9bad99', width=2)
-        draw.rectangle((500, 85, 780, 245), fill='#f3efdc', outline='#9bad99', width=2)
-        draw.polygon([(220, 245), (450, 100), (680, 245)], fill='#39764f')
-        draw.line((500, 80, 500, 255), fill=GREEN, width=3)
-        draw.text((240, 275), 'Não existe faixa repetida para ajustar.', font=font(22), fill='#384d3b')
-        return image
-    margin = help_data['configuracao']['margem_mm']
-    draw.text((25, 16), '1  Corte apenas a margem', font=font(24, True), fill=GREEN)
-    draw.text((530, 16), '2  Alinhe a imagem repetida', font=font(24, True), fill=GREEN)
-    draw.rectangle((30, 70, 430, 270), fill='white', outline='#a5b6a4', width=2)
-    draw.rectangle((50, 90, 375, 250), fill='#f3efdc')
-    draw.polygon([(50, 250), (200, 110), (375, 250)], fill='#39764f')
-    draw.ellipse((300, 104, 362, 166), fill='#c87a4e')
-    draw.rectangle((330, 90, 375, 250), outline='#7d9e77', width=3)
-    if margin:
-        for y in range(65, 280, 14):
-            draw.line((375, y, 375, y + 8), fill='#ad5039', width=3)
-        draw.text((383, 92), 'cortar', font=font(17, True), fill='#9b422d')
-        draw.text((38, 286), 'Preserve a faixa do desenho.', font=font(21), fill=GREEN)
-    else:
-        draw.text((38, 286), 'Margem zero: não há borda para aparar.', font=font(19), fill=GREEN)
-    # Arte contínua: o recorte 220..280 é impresso nas duas folhas.
-    art = Image.new('RGB', (410, 160), '#f3efdc')
+    whole = help_data['montagem'] == 'inteiras'
+    draw.text((25, 12), 'Folhas inteiras: encoste o papel' if whole else
+              'Sem faixa repetida: encoste as imagens' if help_data['modo'] == 'borda_a_borda' else
+              'Dobre a margem esquerda de A2 para trás', font=font(26), fill=GREEN)
+    art = Image.new('RGB', (660, 150), '#f3efdc')
     painter = ImageDraw.Draw(art)
-    painter.polygon([(0, 160), (180, 15), (350, 160)], fill='#39764f')
-    painter.ellipse((245, 18, 307, 80), fill='#c87a4e')
-    x, y = 530, 90
-    draw.rectangle((x + 200, y - 20, x + 430, y + 180), fill='white', outline='#a5b6a4', width=2)
-    image.paste(art.crop((220, 0, 410, 160)), (x + 220, y))
-    draw.rectangle((x - 20, y - 20, x + 280, y + 180), fill='white', outline='#a5b6a4', width=2)
-    image.paste(art.crop((0, 0, 280, 160)), (x, y))
-    draw.line((x + 280, y - 20, x + 280, y + 180), fill=GREEN, width=2)
-    draw.text((535, 286), 'A por cima; B por baixo. Desenho contínuo.', font=font(19), fill=GREEN)
+    painter.polygon([(0,150),(240,15),(480,150)], fill='#39764f')
+    painter.ellipse((430,20,490,80), fill='#c87a4e')
+    if whole:
+        draw.rectangle((90,70,440,260),fill='white',outline='#65765f',width=2)
+        draw.rectangle((440,70,790,260),fill='white',outline='#65765f',width=2)
+        image.paste(art.crop((0,0,330,150)),(100,90))
+        image.paste(art.crop((330,0,660,150)),(450,90))
+        draw.text((105,65),'A1',font=font(20),fill=GREEN)
+        draw.text((455,65),'A2',font=font(20),fill=GREEN)
+        draw.text((75,285),'Sem cortar, dobrar ou sobrepor. As faixas brancas ficam visíveis.',font=font(22),fill=GREEN)
+    else:
+        draw.rectangle((75,70,465,260),fill='white',outline='#65765f',width=2)
+        image.paste(art.crop((0,0,350,150)),(95,90))
+        # A folha nova fica por cima; a margem esquerda está dobrada para trás.
+        draw.rectangle((415,70,805,260),fill='white',outline='#65765f',width=2)
+        image.paste(art.crop((320,0,660,150)),(415,90))
+        for y in range(75,255,14):
+            draw.line((415,y,415,y+7),fill='#333333',width=2)
+        draw.text((110,65),'A1: por baixo',font=font(19),fill=GREEN)
+        draw.text((480,65),'A2: por cima',font=font(19),fill=GREEN)
+        draw.text((75,280),'Tracejado = dobra para trás. Alinhe o desenho e fixe pelo verso.',font=font(22),fill=GREEN)
     return image
 
 
@@ -221,6 +213,14 @@ class Desktop:
         self.orientation = tk.StringVar(value='Em pé (retrato)')
         orientation = ttk.Combobox(page, textvariable=self.orientation, values=('Em pé (retrato)', 'Deitadas (paisagem)'), state='readonly')
         orientation.pack(fill='x'); orientation.bind('<<ComboboxSelected>>', lambda _event: self.orientation_changed()); self.inputs.append(orientation)
+        ttk.Label(page, text='Montagem sem recortar', style='Hint.TLabel').pack(anchor='w', pady=(8, 4))
+        self.assembly_mode = tk.StringVar(value='Dobrar bordas para trás')
+        mode = ttk.Combobox(page, textvariable=self.assembly_mode,
+                            values=('Dobrar bordas para trás', 'Folhas inteiras (faixas brancas)'), state='readonly')
+        mode.pack(fill='x'); mode.bind('<<ComboboxSelected>>', lambda _event: self.orientation_changed()); self.inputs.append(mode)
+        self.assembly_hint = tk.StringVar()
+        self.assembly_hint_label = ttk.Label(page, textvariable=self.assembly_hint, style='Hint.TLabel', wraplength=285)
+        self.assembly_hint_label.pack(anchor='w', pady=4)
         self.advanced_button = self.button(page, 'Ajustes de impressão…', self.toggle_advanced); self.advanced_button.pack(fill='x', pady=8)
         self.advanced = ttk.Frame(page)
         for row, (key, label) in enumerate((('margem_mm', 'Borda branca (mm)'), ('sobreposicao_mm', 'Faixa para colar (mm)'))):
@@ -229,7 +229,7 @@ class Desktop:
             entry = ttk.Entry(self.advanced, textvariable=value, width=8)
             entry.grid(row=row, column=1, padx=8, pady=3); entry.bind('<KeyRelease>', self.mark_dirty); self.inputs.append(entry)
         self.marks = tk.BooleanVar(value=True)
-        marks = ttk.Checkbutton(self.advanced, text='Marcas de corte e números', variable=self.marks, command=self.mark_dirty)
+        marks = ttk.Checkbutton(self.advanced, text='Guias de montagem e códigos das folhas', variable=self.marks, command=self.mark_dirty)
         marks.grid(row=2, column=0, columnspan=2, sticky='w', pady=6); self.inputs.append(marks)
         self.apply_button = self.button(page, 'Atualizar prévia', self.configure_poster); self.apply_button.pack(fill='x')
         ttk.Label(page, text='A imagem fica inteira, sem esticar.\nPode sobrar espaço branco.', style='Hint.TLabel', wraplength=285).pack(anchor='w', pady=8)
@@ -247,6 +247,8 @@ class Desktop:
         self.output = tk.StringVar()
         self.output_name.trace_add('write', lambda *_args: self.sync_output())
         self.output_folder.trace_add('write', lambda *_args: self.sync_output()); self.sync_output()
+        self.map_button = self.button(page, 'Salvar mapa de montagem (PDF)', lambda: self.export_pdf(mapa=True))
+        self.map_button.pack(fill='x', pady=4)
         self.saved_label = ttk.Label(page, text='', wraplength=285, foreground=GREEN); self.saved_label.pack(anchor='w', pady=8)
         ttk.Label(page, text='Ao imprimir, escolha 100% ou Tamanho real.\nDesative Ajustar à página.', style='Hint.TLabel', wraplength=285).pack(anchor='w', pady=8)
         self.status = tk.StringVar(value='Escolha uma imagem para começar.')
@@ -270,7 +272,7 @@ class Desktop:
         self.preview_canvas.bind('<Configure>', lambda _event: self.paint_preview())
         self.preview_notice = tk.StringVar(value='')
         ttk.Label(self.preview_tab, textvariable=self.preview_notice, style='Hint.TLabel', wraplength=650).pack(anchor='w', pady=6)
-        ttk.Label(self.preview_tab, text='O verde mostra a faixa repetida para unir as folhas. Essa cor não sai no PDF.', style='Hint.TLabel', wraplength=650).pack(anchor='w')
+        self.legend = ttk.Label(self.preview_tab, text='', style='Hint.TLabel', wraplength=650); self.legend.pack(anchor='w')
         ttk.Label(self.help_tab, text='Como montar as folhas', style='Heading.TLabel').pack(anchor='w')
         self.help_config = ttk.Label(self.help_tab, text='', style='Hint.TLabel'); self.help_config.pack(anchor='w', pady=8)
         self.help_image = ttk.Label(self.help_tab); self.help_image.pack(fill='x')
@@ -428,7 +430,7 @@ class Desktop:
                 'previa.gerar':'Prévia pronta. Escolha uma folha ou veja o pôster completo.',
                 'sessao.reiniciar':'Escolha uma imagem para começar.',
                 'programa.sobre':'Sobre o Amplia.',
-                'ajuda.montagem':'Confira o recorte e a união das folhas.',
+                'ajuda.montagem':'Confira o modo, a ordem e a união das folhas.',
                 'comandos.listar':'Comandos disponíveis para automação.'}.get(command,'Pronto.')
 
 
@@ -453,7 +455,9 @@ class Desktop:
     def toggle_advanced(self):
         if self.advanced.winfo_manager():
             self.advanced.pack_forget(); self.advanced_button.configure(text='Ajustes de impressão…')
+            self.assembly_hint_label.pack(anchor='w', pady=4, before=self.advanced_button)
         else:
+            self.assembly_hint_label.pack_forget()
             self.advanced.pack(fill='x', before=self.apply_button)
             self.advanced_button.configure(text='Ocultar ajustes de impressão')
 
@@ -462,6 +466,8 @@ class Desktop:
             return
         self.dirty = True
         self.export_button.configure(state='disabled')
+        self.print_button.configure(state='disabled')
+        self.map_button.configure(state='disabled')
         self.status.set('Ajustes pendentes. Clique em Atualizar prévia para aplicá-los.' if not self.size_mode.get().startswith('Por folhas') else 'A prévia será atualizada com os novos ajustes.')
         self.preview_notice.set('Há alterações para aplicar.')
 
@@ -485,7 +491,8 @@ class Desktop:
         except ValueError:
             self.advance_after_config = False
             self.status.set('Confira os campos: use números inteiros nas folhas e números válidos nas medidas.'); return
-        values.update(orientacao='paisagem' if 'paisagem' in self.orientation.get() else 'retrato', marcas=self.marks.get())
+        values.update(orientacao='paisagem' if 'paisagem' in self.orientation.get() else 'retrato', marcas=self.marks.get(),
+                      montagem='inteiras' if self.assembly_mode.get().startswith('Folhas inteiras') else 'dobrar')
         self.submit('poster.configurar', values)
 
     def print_poster(self):
@@ -500,7 +507,7 @@ class Desktop:
         self.steps.select(2)
         self.submit('poster.imprimir')
 
-    def export_pdf(self):
+    def export_pdf(self, mapa=False):
         if self.dirty:
             self.go_pdf(); return
         name = self.output_name.get().strip()
@@ -511,11 +518,13 @@ class Desktop:
         folder = Path(self.output_folder.get().strip().strip('"'))
         if not folder.is_dir():
             self.status.set('A pasta de destino não existe. Clique em Escolher pasta ou confira o caminho.'); return
+        if mapa:
+            name = Path(name).stem + '-mapa.pdf'
         path = folder/name
         replace = path.exists()
         if replace and not messagebox.askyesno('Substituir PDF?', f'Já existe um arquivo chamado {name}. Deseja substituí-lo?', parent=self.root, default='no'):
             return
-        self.submit('pdf.exportar', {'caminho':str(path), 'substituir':replace})
+        self.submit('mapa.exportar' if mapa else 'pdf.exportar', {'caminho':str(path), 'substituir':replace})
 
     def change_view(self):
         selected = self.view.current()
@@ -606,7 +615,10 @@ class Desktop:
                 if command == 'programa.sobre':
                     self.render_about(response['resultado'])
                     self.tabs.select(self.about_tab if response['resultado']['exibir'] else self.preview_tab)
-                if command == 'pdf.exportar':
+                if command == 'mapa.exportar':
+                    self.status.set('Mapa salvo. É uma folha de instruções separada; não entra no cartaz.')
+                    self.saved_label.configure(text='Mapa: ' + Path(response['resultado']['caminho']).name)
+                elif command == 'pdf.exportar':
                     result = response['resultado']
                     self.unsaved = False
                     self.status.set(f"PDF salvo em {result['caminho']}. Imprima em 100% ou Tamanho real.")
@@ -639,7 +651,7 @@ class Desktop:
                 self.advance_after_config = False
                 code = response['erro']['codigo']
                 message = {'MARGEM_INVALIDA':'A borda branca está muito grande. Reduza-a para deixar espaço para a imagem.',
-                           'MARGEM_PARA_MARCAS':'As marcas de corte precisam de borda branca de pelo menos 5 mm. Aumente a borda ou desative as marcas.',
+                           'MARGEM_PARA_MARCAS':'As guias de montagem precisam de borda branca de pelo menos 5 mm. Aumente a borda ou desative as marcas.',
                            'SOBREPOSICAO_INVALIDA':'A faixa para colar deve ser menor que a área impressa da folha.',
                            'GRADE_INVALIDA':'Use pelo menos uma folha em cada direção e até 400 no total.'}.get(code, response['erro']['mensagem'])
                 if code == 'OPERACAO_FALHOU' and response['comando'] == 'imagem.abrir':
@@ -666,19 +678,26 @@ class Desktop:
             value.set(f"{state['configuracao'][key]:g}".replace('.',','))
         self.orientation.set('Deitadas (paisagem)' if state['configuracao']['orientacao']=='paisagem' else 'Em pé (retrato)')
         self.marks.set(state['configuracao']['marcas'])
+        whole = state['configuracao']['montagem'] == 'inteiras'
+        self.assembly_mode.set('Folhas inteiras (faixas brancas)' if whole else 'Dobrar bordas para trás')
+        self.assembly_hint.set('Encoste as folhas; fita pelo verso. As faixas brancas ficam visíveis.' if whole else
+                               'Dobre só esquerda/cima nas folhas indicadas. A folha nova vai por cima.')
+        self.legend.configure(text='Folhas inteiras e faixas brancas reais da montagem.' if whole else
+                              'O verde localiza a faixa repetida; não sai no PDF. Códigos iguais aos das folhas.')
         image = state['imagem']
         self.image_label.configure(text=f"{image['nome']}\n{image['largura_px']} × {image['altura_px']} pixels" if image else 'Nenhuma imagem escolhida.')
         pages = state['folhas']
-        self.view.configure(values=['Pôster completo'] + ([f"Folha {p['numero']} · L{p['linha']} C{p['coluna']}" for p in pages['folhas']] if pages else []))
+        self.view.configure(values=['Pôster completo'] + ([f"{p['codigo']} · Folha {p['numero']} · L{p['linha']} C{p['coluna']}" for p in pages['folhas']] if pages else []))
         self.view.current(0)
         if pages:
             for key in ('colunas', 'linhas'):
                 self.sheet_values[key].set(str(pages[key]))
             self.sheet_summary.set(f"{pages['colunas']} × {pages['linhas']} = {pages['total_folhas']} folhas A4")
             dimensions = ' × '.join(f'{value/10:.1f}'.replace('.',',') for value in pages['poster_mm'])
-            summary = f"{pages['colunas']} × {pages['linhas']} = {pages['total_folhas']} folhas A4 · {dimensions} cm"
+            summary = f"{pages['colunas']} × {pages['linhas']} = {pages['total_folhas']} folhas A4 · desenho {dimensions} cm"
             self.metrics.configure(text=summary)
-            self.pdf_summary.set(summary+'\nUma página do PDF para cada folha.')
+            mounted = ' × '.join(f'{value/10:.1f}'.replace('.', ',') for value in pages['papel_montado_mm'])
+            self.pdf_summary.set(summary+'\nPapel montado: '+mounted+' cm.\nUma página do PDF por folha; mapa separado.')
             self.preview_notice.set('A imagem pode perder nitidez neste tamanho.' if pages['avisos'] else 'Imagem inteira, sem cortes.')
         else:
             self.metrics.configure(text='Sua imagem aparecerá aqui.')
@@ -688,6 +707,7 @@ class Desktop:
         self.apply_button.configure(state='normal' if image else 'disabled')
         self.export_button.configure(state='normal' if image else 'disabled')
         self.print_button.configure(state='normal' if image else 'disabled')
+        self.map_button.configure(state='normal' if image else 'disabled')
         self._syncing = False
         self.step_changed()
 

@@ -47,7 +47,7 @@ COMMANDS = {
     }),
     'comandos.listar': dict(descricao='Descobre comandos, parâmetros e efeitos.', efeito='consulta', parametros={}),
     'estado.obter': dict(descricao='Consulta imagem, configuração e paginação atuais.', efeito='consulta', parametros={}),
-    'ajuda.montagem': dict(descricao='Explica com dados estruturados o recorte e a montagem para a configuração aplicada, mesmo sem imagem.', efeito='consulta', parametros={
+    'ajuda.montagem': dict(descricao='Explica a montagem sem recorte para a configuração aplicada, mesmo sem imagem.', efeito='consulta', parametros={
         'exibir': param('boolean', 'Mostra ou fecha o painel na interface; no terminal apenas informa essa preferência. Padrão true.'),
     }),
     'imagem.abrir': dict(descricao='Abre PNG, JPEG, WebP, BMP ou TIFF; usa o primeiro quadro.', efeito='alteracao', parametros={
@@ -63,7 +63,8 @@ COMMANDS = {
         'margem_mm': param('number', 'Margem uniforme em cada lado da folha A4, >= 0.'),
         'sobreposicao_mm': param('number', 'Faixa repetida entre folhas, >= 0 e menor que a área útil.'),
         'orientacao': param('string', 'Orientação das folhas A4.', valores=['retrato', 'paisagem']),
-        'marcas': param('boolean', 'Marcas de recorte e identificação na margem; exige margem >= 5 mm.'),
+        'montagem': param('string', 'Dobrar margens para trás ou unir folhas inteiras com faixas brancas.', valores=['dobrar', 'inteiras']),
+        'marcas': param('boolean', 'Guias de montagem e identificação na margem; exige margem >= 5 mm.'),
     }),
     'folhas.listar': dict(descricao='Calcula folhas em ordem de leitura e retângulos no pôster.', efeito='consulta', parametros={}),
     'previa.gerar': dict(descricao='Renderiza prévia PNG do pôster ou de uma folha, sem mudar a configuração.', efeito='consulta_ou_gravacao', parametros={
@@ -75,6 +76,10 @@ COMMANDS = {
     'poster.imprimir': dict(descricao='Abre a escolha da impressora no Windows e imprime em tamanho real após confirmação.', efeito='impressao', parametros={}),
     'pdf.exportar': dict(descricao='Exporta PDF A4 em tamanho real, com uma página por folha.', efeito='gravacao', parametros={
         'caminho': param('string', 'Destino .pdf.', required=True),
+        'substituir': param('boolean', 'Permite substituir arquivo existente. Padrão false.'),
+    }),
+    'mapa.exportar': dict(descricao='Salva uma página A4 com ordem das folhas e instruções de montagem, separada do pôster.', efeito='gravacao', parametros={
+        'caminho': param('string', 'Destino .pdf para o mapa de montagem.', required=True),
         'substituir': param('boolean', 'Permite substituir arquivo existente. Padrão false.'),
     }),
     'sessao.reiniciar': dict(descricao='Descarta a imagem e restaura a configuração inicial da sessão.', efeito='alteracao', parametros={}),
@@ -129,7 +134,7 @@ class Amplia:
     @staticmethod
     def defaults():
         return dict(largura_mm=400.0, altura_mm=300.0, margem_mm=10.0,
-                    sobreposicao_mm=10.0, orientacao='retrato', marcas=True)
+                    sobreposicao_mm=10.0, orientacao='retrato', marcas=True, montagem='dobrar')
 
     def execute(self, request):
         """Única entrada para UI, HTTP, lote e protocolo JSON Lines."""
@@ -194,7 +199,7 @@ class Amplia:
                         uso_ia='Desenvolvimento com assistência do Codex, da OpenAI, sob direção humana.',
                         terceiros=['Python e Tcl/Tk', 'Pillow', 'ReportLab', 'chardet', 'Runtime Microsoft'],
                         aviso_marcas='As marcas citadas pertencem aos seus donos; o Amplia é um projeto independente, sem vínculo com elas.',
-                        distribuicao='Distribuição local; ainda sem instalador ou canal público de atualização.')
+                        distribuicao='Versão em teste. Fontes e candidatas no GitHub; sem instalador ou atualização automática.')
         if command == 'comandos.listar':
             return dict(comandos=COMMANDS, protocolo='JSON Lines em --stdio; mesmo objeto via POST /api/comando',
                         unidades='milímetros; coordenadas das folhas a partir do canto superior esquerdo do pôster',
@@ -226,7 +231,7 @@ class Amplia:
                     fail('GRADE_INVALIDA', 'Use quantidades positivas e no máximo 400 folhas no total.')
                 pw, ph = (210, 297) if config['orientacao'] == 'retrato' else (297, 210)
                 uw, uh = pw - 2 * config['margem_mm'], ph - 2 * config['margem_mm']
-                overlap = config['sobreposicao_mm']
+                overlap = 0 if config['montagem'] == 'inteiras' else config['sobreposicao_mm']
                 config['largura_mm'] = uw + (cols - 1) * (uw - overlap)
                 config['altura_mm'] = uh + (rows - 1) * (uh - overlap)
             ratio = self.image.width / self.image.height
@@ -245,45 +250,60 @@ class Amplia:
             self.require_image()
             from amplia_print import print_poster
             return print_poster(self)
-        if command == 'pdf.exportar':
+        if command in {'pdf.exportar', 'mapa.exportar'}:
             if Path(args['caminho']).suffix.lower() != '.pdf':
                 fail('EXTENSAO_INVALIDA', 'O destino precisa terminar em .pdf.')
-            data = self.pdf_bytes()
+            data = self.map_pdf_bytes() if command == 'mapa.exportar' else self.pdf_bytes()
             output = atomic_write(args['caminho'], data, args.get('substituir', False))
-            return dict(caminho=output, paginas=self.layout()['total_folhas'], bytes=len(data),
+            return dict(caminho=output, paginas=1 if command == 'mapa.exportar' else self.layout()['total_folhas'], bytes=len(data),
                         sha256=hashlib.sha256(data).hexdigest(), impressao='100% / tamanho real; desativar ajuste à página')
         raise AssertionError(command)
 
     def assembly_help(self, show=True):
-        margin, overlap = self.config['margem_mm'], self.config['sobreposicao_mm']
+        margin = self.config['margem_mm']
+        whole = self.config['montagem'] == 'inteiras'
+        overlap = 0 if whole else self.config['sobreposicao_mm']
         paper_width = 210 if self.config['orientacao'] == 'retrato' else 297
         usable = paper_width - 2 * margin
-        cut = ('Na folha que ficará por cima, apare somente a margem branca direita, no limite da imagem. '
-               'Não corte a faixa de imagem repetida.' if margin else
-               'A margem configurada é zero: não há margem de papel reservada para aparar. Preserve a imagem.')
-        align = ('Coloque a folha à direita por baixo e alinhe os mesmos traços na faixa repetida. '
-                 'Fixe provisoriamente antes de colar.' if overlap else
-                 'Sem sobreposição, una as bordas da imagem diretamente, sem deixar frestas. '
-                 'Não existe faixa repetida para ajuste.')
-        return dict(exibir=show, titulo='Como cortar e montar sem perder imagem',
-                    modo='sobrepor' if overlap else 'borda_a_borda',
+        fold = ('Dobre para trás somente a borda esquerda das folhas a partir da segunda coluna e '
+                'a borda de cima das folhas a partir da segunda linha, nas linhas tracejadas. '
+                'Não dobre a imagem nem as bordas externas do cartaz.' if margin else
+                'A margem é zero: não há margem para dobrar. Preserve a imagem.')
+        align = ('A folha nova fica POR CIMA da anterior. Encoste a borda dobrada nos sinais de alinhamento '
+                 'da folha anterior; os desenhos repetidos devem coincidir. Monte cada linha da esquerda '
+                 'para a direita e depois ponha a linha de baixo por cima da de cima.' if overlap else
+                 'Sem sobreposição, encoste as bordas da imagem, sem repetir nem esconder trechos. '
+                 'Prenda com fita pelo verso.')
+        steps = [dict(titulo='Organize antes de unir', texto='Imprima em A4, 100% / tamanho real, uma face por folha. '
+                      'Siga A1, A2, A3... na primeira linha; B1, B2, B3... na segunda. Use o mapa de montagem.'),
+                 dict(titulo='Dobre somente as bordas indicadas', texto=fold),
+                 dict(titulo='Alinhe antes de colar', texto=align),
+                 dict(titulo='Fixe pelo verso', texto='Confira os traços nas emendas antes de prender. '
+                      'Use fita pelo verso; para cola, aplique pouca quantidade na área escondida, após alinhar.')]
+        if whole:
+            steps[1] = dict(titulo='Mantenha as folhas inteiras', texto='Não corte, não dobre e não sobreponha. '
+                            'Encoste os lados do papel, uma folha ao lado da outra, seguindo os códigos.')
+            steps[2] = dict(titulo='Confira as faixas brancas', texto='As margens das duas folhas ficam visíveis na união. '
+                            f'Com margem de {margin:g} mm, a faixa branca interna mede {2 * margin:g} mm. '
+                            'Cada trecho do desenho aparece uma vez: não alinhe imagens por sobreposição.')
+        return dict(exibir=show, titulo='Montar sem recortar',
+                    modo='folhas_inteiras' if whole else ('sobrepor' if overlap else 'borda_a_borda'),
+                    montagem=self.config['montagem'],
                     configuracao=dict(margem_mm=margin, sobreposicao_mm=overlap,
                                       orientacao=self.config['orientacao'], marcas=self.config['marcas']),
-                    conceitos=dict(margem='Borda do papel fora do retângulo do pôster impresso naquela folha.',
-                                   sobreposicao='Faixa do desenho impressa nas duas folhas vizinhas para alinhamento.',
-                                   previa='Faixas verdes e números sobre o desenho são apenas da prévia; não entram no PDF.'),
+                    conceitos=dict(margem='Borda branca reservada ao redor do desenho em cada folha.',
+                                   sobreposicao='Trecho repetido somente no modo com dobra; serve para alinhar.',
+                                   previa=('A prévia mostra as folhas inteiras e as faixas brancas que ficarão visíveis.' if whole else
+                                           'Códigos e faixas verdes na prévia localizam folhas e trechos repetidos; não cobrem a arte impressa.')),
                     exemplo_horizontal_mm=dict(primeira_folha=[0, clean_float(usable)],
                                                 segunda_comeca=clean_float(usable - overlap),
                                                 faixa_repetida=[clean_float(usable - overlap), clean_float(usable)] if overlap else None,
                                                 esquema_sem_escala=True),
-                    passos=[dict(titulo='Imprima em tamanho real', texto='Use 100% / tamanho real e desative ajustar à página. Organize as folhas por linha e coluna.'),
-                            dict(titulo='Prepare a borda da folha de cima', texto=cut),
-                            dict(titulo='Alinhe e una as folhas', texto=align),
-                            dict(titulo='Repita entre as linhas', texto=('Para uma emenda vertical, apare apenas a margem inferior da linha de cima e alinhe a próxima linha por baixo.' if margin else 'Na vertical, una as linhas preservando a imagem; não há margem reservada para aparar.'))],
-                    cuidados=['Não elimine a faixa repetida das duas folhas.',
-                              'Não corte brancos que façam parte do desenho ou da centralização do pôster.',
-                              'Com marcas habilitadas, recorte pelo limite indicado; elas não mandam eliminar a sobreposição.',
-                              'O desenho pode ficar contínuo e a emenda física do papel ainda ser visível.'],
+                    passos=steps,
+                    cuidados=['Escolha o modo de montagem antes de imprimir: a divisão da imagem muda.',
+                              'Não dobre brancos que pertencem à imagem. A linha tracejada indica a borda reservada.',
+                              'A impressão em frente e verso não serve para esta montagem.',
+                              'As emendas e as dobras do papel podem continuar perceptíveis.'],
                     folha_unica=bool(self.image is not None and self.layout()['total_folhas'] == 1),
                     impressao_fisica_validada=False)
 
@@ -341,7 +361,9 @@ class Amplia:
 
     def layout(self, config=None):
         cfg = config if config is not None else self.config
-        w, h, margin, overlap = (float(cfg[k]) for k in ('largura_mm', 'altura_mm', 'margem_mm', 'sobreposicao_mm'))
+        w, h, margin, requested_overlap = (float(cfg[k]) for k in ('largura_mm', 'altura_mm', 'margem_mm', 'sobreposicao_mm'))
+        whole = cfg['montagem'] == 'inteiras'
+        overlap = 0.0 if whole else requested_overlap
         if not 10 <= w <= 5000 or not 10 <= h <= 5000:
             fail('TAMANHO_INVALIDO', 'Largura e altura devem ficar entre 10 e 5000 mm.')
         pw, ph = (210.0, 297.0) if cfg['orientacao'] == 'retrato' else (297.0, 210.0)
@@ -350,7 +372,7 @@ class Amplia:
             fail('MARGEM_INVALIDA', 'A margem deve ser não negativa e deixar área útil na folha.')
         if cfg['marcas'] and margin < 5:
             fail('MARGEM_PARA_MARCAS', 'Use margem de pelo menos 5 mm ou desative as marcas.')
-        if overlap < 0 or overlap >= min(uw, uh):
+        if requested_overlap < 0 or requested_overlap >= min(uw, uh):
             fail('SOBREPOSICAO_INVALIDA', 'A sobreposição deve ser não negativa e menor que a largura e altura úteis.')
         cols = max(1, math.ceil((w - overlap) / (uw - overlap) - 1e-10))
         rows = max(1, math.ceil((h - overlap) / (uh - overlap) - 1e-10))
@@ -361,18 +383,36 @@ class Amplia:
             for col in range(cols):
                 x, y = col * (uw - overlap), row * (uh - overlap)
                 pages.append(dict(numero=len(pages) + 1, linha=row + 1, coluna=col + 1,
+                                  codigo=self.page_code(row, col),
+                                  papel_x_mm=clean_float(col * (pw if whole else uw - overlap)),
+                                  papel_y_mm=clean_float(row * (ph if whole else uh - overlap)),
+                                  dobras=[] if whole or not margin else
+                                         (['esquerda'] if col else []) + (['cima'] if row else []),
                                   x_mm=clean_float(x), y_mm=clean_float(y),
                                   largura_mm=clean_float(min(uw, w - x)), altura_mm=clean_float(min(uh, h - y))))
         scale = min(w / self.image.width, h / self.image.height) if self.image is not None else 1
         iw, ih = (self.image.width * scale, self.image.height * scale) if self.image is not None else (w, h)
         dpi = 25.4 / scale if self.image is not None else 0
         return dict(papel='A4', papel_mm=[pw, ph], area_util_mm=[clean_float(uw), clean_float(uh)],
-                    poster_mm=[w, h], margem_mm=margin, sobreposicao_mm=overlap,
+                    poster_mm=[w, h], margem_mm=margin, sobreposicao_mm=overlap, montagem=cfg['montagem'],
+                    marcas=cfg['marcas'], recuo_guias_mm=min(2.5, margin * .25) + min(3.4, margin * .38) / 2 + .3,
+                    papel_montado_mm=[clean_float(pw * cols if whole else pw + (cols - 1) * (uw - overlap)),
+                                      clean_float(ph * rows if whole else ph + (rows - 1) * (uh - overlap))],
+                    faixa_branca_interna_mm=2 * margin if whole else 0,
                     colunas=cols, linhas=rows, total_folhas=cols * rows,
                     imagem_no_poster_mm=dict(x=clean_float((w - iw) / 2), y=clean_float((h - ih) / 2),
                                             largura=clean_float(iw), altura=clean_float(ih)),
                     resolucao_efetiva_dpi=round(dpi, 1),
                     avisos=['Resolução abaixo de 100 dpi no tamanho final.'] if dpi and dpi < 100 else [], folhas=pages)
+
+    @staticmethod
+    def page_code(row, col):
+        letters = ''
+        row += 1
+        while row:
+            row, digit = divmod(row - 1, 26)
+            letters = chr(65 + digit) + letters
+        return letters + str(col + 1)
 
     @staticmethod
     def font(size):
@@ -385,6 +425,16 @@ class Amplia:
         layout = self.layout()
         w, h = layout['poster_mm']
         box = layout['imagem_no_poster_mm']
+        if page_number is None and layout['montagem'] == 'inteiras':
+            mounted_w, mounted_h = layout['papel_montado_mm']
+            scale = pixels / max(mounted_w, mounted_h)
+            image = Image.new('RGB', (max(1, round(mounted_w * scale)), max(1, round(mounted_h * scale))), 'white')
+            for page in layout['folhas']:
+                tile = self.render(max(1, round(max(layout['papel_mm']) * scale)), page['numero'])
+                x, y = round(page['papel_x_mm'] * scale), round(page['papel_y_mm'] * scale)
+                image.paste(tile, (x, y))
+                ImageDraw.Draw(image).rectangle((x, y, x + tile.width - 1, y + tile.height - 1), outline='#9bad99')
+            return image
         if page_number is None:
             scale = pixels / max(w, h)
             image = Image.new('RGB', (max(1, round(w * scale)), max(1, round(h * scale))), 'white')
@@ -401,7 +451,7 @@ class Amplia:
                 # Uma faixa final menor que um pixel ainda precisa de contorno válido.
                 draw.rectangle((x, y, max(x, right - 1), max(y, bottom - 1)), outline=(31, 110, 67, 220), width=2)
                 draw.rectangle((x + 4, y + 4, x + 58, y + 29), fill=(255, 255, 255, 230))
-                draw.text((x + 10, y + 6), str(page['numero']), font=self.font(17), fill=(20, 60, 40, 255))
+                draw.text((x + 10, y + 6), page['codigo'], font=self.font(17), fill=(20, 60, 40, 255))
             return image
         page = layout['folhas'][page_number - 1]
         pw, ph = layout['papel_mm']
@@ -416,23 +466,83 @@ class Amplia:
              0, sy / scale, (page['y_mm'] - box['y']) * sy), Image.Resampling.BICUBIC, fillcolor='white')
         image.paste(region, (round(margin * scale), round(margin * scale)))
         if self.config['marcas']:
-            draw = ImageDraw.Draw(image)
-            self.draw_raster_marks(draw, page, layout, scale)
+            self.draw_raster_marks(image, page, layout, scale)
         return image
 
-    def draw_raster_marks(self, draw, page, layout, scale):
-        margin = self.config['margem_mm']
+    def print_marks(self, page, layout):
+        """Mesmas posições físicas no PDF vetorial e na impressão Windows rasterizada."""
+        m = layout['margem_mm']
         pw, ph = layout['papel_mm']
-        for x in (margin, margin + page['largura_mm']):
-            for y in (margin, margin + page['altura_mm']):
-                # As marcas ficam do lado de fora do retângulo da imagem.
-                dx = -1 if x == margin else 1
-                dy = -1 if y == margin else 1
-                draw.line(((x + dx * .5) * scale, y * scale, (x + dx * 3) * scale, y * scale), fill='#666666')
-                draw.line((x * scale, (y + dy * .5) * scale, x * scale, (y + dy * 3) * scale), fill='#666666')
-        draw.text((margin * scale, (ph - margin / 2) * scale),
-                  f"Amplia | {page['numero']}/{layout['total_folhas']} | L{page['linha']} C{page['coluna']} | 100%",
-                  font=self.font(max(9, round(2.4 * scale))), fill='#555555', anchor='lm')
+        row, col = page['linha'] - 1, page['coluna'] - 1
+        whole = layout['montagem'] == 'inteiras'
+        code = page['codigo']
+        # Mantém as letras perto da imagem, longe da borda que muitas impressoras não alcançam.
+        inset = min(2.5, m * .25)
+        texts, lines = [], []
+        def text(x, y, value, size=2.3, angle=0, bold=False):
+            texts.append(dict(x=x, y=y, texto=value, tamanho=min(size, m * .38), angulo=angle, negrito=bold))
+        def line(x1, y1, x2, y2, dashed=False):
+            lines.append(dict(pontos=[x1, y1, x2, y2], tracejada=dashed))
+        text(pw * .29, m - inset, f"{code} | FOLHA {page['numero']}/{layout['total_folhas']} | CIMA ^", 3.4, bold=True)
+        top = ('FOLHA INTEIRA: NAO CORTAR NEM DOBRAR' if whole else
+               'DOBRE A BORDA DE CIMA PARA TRAS' if row else 'PRIMEIRA LINHA: NAO DOBRE EM CIMA')
+        text(pw * .72, m - inset, top, 2.1)
+        left = ('ENCOSTE O PAPEL EM ' + self.page_code(row, col - 1) if whole and col else
+                'DOBRE PARA TRAS | ' + code + ' SOBRE ' + self.page_code(row, col - 1) if col else
+                'BORDA EXTERNA: NAO DOBRAR')
+        text(m - inset, ph * .50, left, 2.4, 90)
+        right = ('PROXIMA: ' + self.page_code(row, col + 1) + (' AO LADO' if whole else ' POR CIMA')
+                 if col + 1 < layout['colunas'] else 'BORDA EXTERNA: NAO DOBRAR')
+        text(pw - m + inset, ph * .50, right, 2.4, 90)
+        below = self.page_code(row + 1, col) if row + 1 < layout['linhas'] else None
+        bottom = ('ABAIXO: ' + below + (' AO LADO; FITA NO VERSO' if whole else ' POR CIMA; FITA NO VERSO')
+                  if below else 'ULTIMA LINHA | FITA PELO VERSO')
+        text(pw * .42, ph - m + inset, bottom, 2.1)
+        text(pw * .87, ph - m + inset, f'{code} | 100%', 3.2, bold=True)
+        if not whole:
+            if col and m:
+                line(m - .15, m, m - .15, ph - m, True)
+            if row and m:
+                line(m, m - .15, pw - m, m - .15, True)
+            # O sinal receptor coincide com a borda dobrada da próxima folha.
+            overlap = layout['sobreposicao_mm']
+            if col + 1 < layout['colunas']:
+                x = pw - m - overlap
+                for y in (m, ph - m):
+                    direction = -1 if y == m else 1
+                    line(x, y + direction * .5, x, y + direction * min(3, m * .3))
+                    line(x - 1, y + direction * 2, x + 1, y + direction * 2)
+            if row + 1 < layout['linhas']:
+                y = ph - m - overlap
+                for x in (m, pw - m):
+                    direction = -1 if x == m else 1
+                    line(x + direction * .5, y, x + direction * min(3, m * .3), y)
+                    line(x + direction * 2, y - 1, x + direction * 2, y + 1)
+        return dict(textos=texts, linhas=lines)
+
+    def draw_raster_marks(self, image, page, layout, scale):
+        draw = ImageDraw.Draw(image)
+        marks = self.print_marks(page, layout)
+        for item in marks['linhas']:
+            x1, y1, x2, y2 = (v * scale for v in item['pontos'])
+            if not item['tracejada']:
+                draw.line((x1, y1, x2, y2), fill='#333333', width=max(1, round(.18 * scale)))
+                continue
+            length = math.hypot(x2 - x1, y2 - y1)
+            for start in range(0, max(1, math.ceil(length)), max(2, round(3 * scale))):
+                end = min(length, start + 1.5 * scale)
+                if length:
+                    draw.line((x1 + (x2-x1)*start/length, y1 + (y2-y1)*start/length,
+                               x1 + (x2-x1)*end/length, y1 + (y2-y1)*end/length), fill='#333333', width=max(1, round(.18 * scale)))
+        for item in marks['textos']:
+            font = self.font(max(1, round(item['tamanho'] * scale)))
+            value = item['texto']
+            bounds = draw.textbbox((0, 0), value, font=font)
+            label = Image.new('RGBA', (max(1, bounds[2]-bounds[0]+4), max(1, bounds[3]-bounds[1]+4)))
+            ImageDraw.Draw(label).text((2-bounds[0], 2-bounds[1]), value, font=font, fill='#222222')
+            if item['angulo']:
+                label = label.rotate(item['angulo'], expand=True)
+            image.paste(label, (round(item['x']*scale-label.width/2), round(item['y']*scale-label.height/2)), label)
 
     def preview(self, args):
         pixels = args.get('pixels', 1200)
@@ -475,20 +585,81 @@ class Amplia:
                           width=box['largura'] * MM, height=box['altura'] * MM)
             pdf.restoreState()
             if self.config['marcas']:
-                pdf.setStrokeColorRGB(.4, .4, .4)
-                pdf.setLineWidth(.25)
-                for x in (margin, margin + page['largura_mm']):
-                    for y in (margin, margin + page['altura_mm']):
-                        dx = -1 if x == margin else 1
-                        dy = -1 if y == margin else 1
-                        pdf.line((x + dx * .5) * MM, (ph - y) * MM, (x + dx * 3) * MM, (ph - y) * MM)
-                        pdf.line(x * MM, (ph - y - dy * .5) * MM, x * MM, (ph - y - dy * 3) * MM)
-                pdf.setFont('Helvetica', 7)
-                pdf.setFillColorRGB(.3, .3, .3)
-                pdf.drawString(margin * MM, (margin / 2 - 1) * MM,
-                               f"Amplia | {page['numero']}/{layout['total_folhas']} | L{page['linha']} C{page['coluna']} | 100% tamanho real")
+                marks = self.print_marks(page, layout)
+                pdf.setStrokeColorRGB(.2, .2, .2)
+                pdf.setLineWidth(.18 * MM)
+                for item in marks['linhas']:
+                    x1, y1, x2, y2 = item['pontos']
+                    pdf.setDash([1.5 * MM, 1.5 * MM] if item['tracejada'] else [])
+                    pdf.line(x1 * MM, (ph-y1) * MM, x2 * MM, (ph-y2) * MM)
+                pdf.setDash([])
+                pdf.setFillColorRGB(.13, .13, .13)
+                for item in marks['textos']:
+                    pdf.saveState()
+                    pdf.translate(item['x'] * MM, (ph-item['y']) * MM)
+                    pdf.rotate(item['angulo'])
+                    pdf.setFont('Helvetica-Bold' if item['negrito'] else 'Helvetica', item['tamanho'] * MM)
+                    pdf.drawCentredString(0, -item['tamanho'] * MM * .34, item['texto'])
+                    pdf.restoreState()
             pdf.showPage()
         pdf.save()
+        return output.getvalue()
+
+    def map_pdf_bytes(self):
+        layout = self.layout()
+        output = io.BytesIO()
+        pdf = canvas.Canvas(output, pagesize=(210 * MM, 297 * MM), invariant=True)
+        pdf.setTitle('Amplia - mapa de montagem')
+        pdf.setAuthor('Amplia')
+        def text(x, y, value, size=10, bold=False):
+            pdf.setFont('Helvetica-Bold' if bold else 'Helvetica', size)
+            pdf.drawString(x * MM, (297-y) * MM, value)
+        whole = layout['montagem'] == 'inteiras'
+        text(15, 20, 'Amplia | Mapa de montagem', 20, True)
+        text(15, 29, 'Folhas inteiras: sem cortar e sem dobrar' if whole else 'Dobrar margens para trás: sem recortar', 12, True)
+        text(15, 37, f"{layout['colunas']} colunas x {layout['linhas']} linhas | {layout['total_folhas']} folhas A4 | 100% tamanho real")
+        cols, rows = layout['colunas'], layout['linhas']
+        # Grades extremas recebem um resumo explícito, em vez de códigos ilegíveis.
+        column_indices = list(range(cols)) if cols <= 10 else [0, 1, 2, 3, 4, None, cols-2, cols-1]
+        row_indices = list(range(rows)) if rows <= 8 else [0, 1, 2, 3, None, rows-2, rows-1]
+        shown_cols, shown_rows = len(column_indices), len(row_indices)
+        pw, ph = layout['papel_mm']
+        tile = min(180 / shown_cols, 120 / shown_rows / (ph / pw))
+        width, height = tile, tile * ph / pw
+        start_x, start_y = (210-shown_cols*width)/2, 45
+        for j, row in enumerate(row_indices):
+            for i, col in enumerate(column_indices):
+                x, y = start_x+i*width, start_y+j*height
+                pdf.setLineWidth(.5)
+                pdf.rect(x*MM, (297-y-height)*MM, width*MM, height*MM)
+                pdf.setFont('Helvetica-Bold', min(18, width*MM*.18, height*MM*.18))
+                code = '...' if row is None or col is None else self.page_code(row, col)
+                pdf.drawCentredString((x+width/2)*MM, (297-y-height*.47)*MM, code)
+                if row is not None and col is not None:
+                    pdf.setFont('Helvetica', min(9, width*MM*.16, height*MM*.12))
+                    pdf.drawCentredString((x+width/2)*MM, (297-y-height*.67)*MM, str(row*cols+col+1))
+        y = start_y+shown_rows*height+8
+        if shown_cols != cols or shown_rows != rows:
+            text(15, y, 'Mapa resumido: ... indica folhas intermediárias. Siga os códigos impressos.', 8, True)
+            y += 8
+        y += 4
+        instructions = (['1. Organize A1, A2, A3...; abaixo, B1, B2, B3... como no mapa.',
+                         '2. Encoste os lados do papel. Não sobreponha as folhas.',
+                         '3. Não corte nem dobre. Fixe com fita adesiva pelo verso.',
+                         f"4. Haverá faixas brancas de {2*layout['margem_mm']:g} mm entre os desenhos."] if whole else
+                        ['1. Organize as folhas como no mapa; comece por A1.',
+                         '2. Da segunda coluna em diante, dobre a margem ESQUERDA para trás.',
+                         '3. A2 fica POR CIMA de A1. Alinhe a borda dobrada com os sinais +.',
+                         '4. Confira os desenhos repetidos antes de prender com fita pelo verso.',
+                         '5. Monte cada linha. Da segunda linha em diante, dobre a margem de CIMA.',
+                         '6. A linha B fica POR CIMA da A: alinhe os sinais e o desenho.',
+                         'Não dobre as bordas externas. Tracejado = dobra; + = alinhamento.'])
+        for instruction in instructions:
+            text(15, y, instruction, 9)
+            y += 7
+        text(15, y+5, 'Uma face por folha. Não use frente e verso nem ajustar à página.', 9, True)
+        text(15, y+12, 'Este mapa é separado do pôster. Não o cole junto às folhas.', 9)
+        pdf.showPage(); pdf.save()
         return output.getvalue()
 
 

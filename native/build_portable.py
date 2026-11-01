@@ -23,7 +23,11 @@ def copy_documentation(target):
     names = ['README.md', 'AUTORES.md', 'CITATION.cff', 'CHANGELOG.md',
              'docs/GUIA-DE-USO.md', 'docs/ARQUITETURA.md', 'docs/COMANDOS.md',
              '.github/SECURITY.md', '.github/CONTRIBUTING.md',
-             'docs/img/icone.png', 'docs/img/fluxo.png', 'docs/img/capa.png']
+             'docs/img/icone.png', 'docs/img/fluxo.png', 'docs/img/capa.png',
+             'docs/LICENCA-traducao-pt-BR.md', 'docs/VITRINE.md',
+             'docs/img/capa-social.png', 'docs/img/capa-quadro.png', 'docs/img/bandeira-brasil.svg',
+             'docs/img/cartaz-geometria.png', 'docs/img/folhas.png', 'docs/img/imprimir-pdf.png',
+             'docs/img/folha-individual.png', 'docs/img/montagem.png', 'docs/img/folhas-inteiras.png']
     for name in names:
         destination = target / name
         destination.parent.mkdir(parents=True, exist_ok=True)
