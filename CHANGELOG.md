@@ -2,7 +2,7 @@
 
 ## Em desenvolvimento
 
-## 0.6.0 · Em preparação
+## 0.6.0 · Pré-lançamento para testes
 
 - Dois modos de montagem sem tesoura: dobrar margens para trás ou unir folhas inteiras com faixas brancas.
 - Identificação por linha e coluna, vizinhos e guias de união nas folhas impressas.

@@ -16,12 +16,12 @@ Imprima ou salve o PDF. Livre, gratuito e sem internet.</p>
   <br>
   <a href="https://github.com/HeraldoAntunes/amplia/actions/workflows/testes.yml"><img src="https://github.com/HeraldoAntunes/amplia/actions/workflows/testes.yml/badge.svg" alt="Testes"></a>
   <a href="https://scorecard.dev/viewer/?uri=github.com/HeraldoAntunes/amplia"><img src="https://api.scorecard.dev/projects/github.com/HeraldoAntunes/amplia/badge" alt="OpenSSF Scorecard"></a>
-  <a href="https://github.com/HeraldoAntunes/amplia/releases/tag/v0.5.0-rc.2"><img src="https://img.shields.io/github/v/release/HeraldoAntunes/amplia?include_prereleases&label=pr%C3%A9-lan%C3%A7amento" alt="Pré-lançamento"></a>
+  <a href="https://github.com/HeraldoAntunes/amplia/releases/tag/v0.6.0-rc.1"><img src="https://img.shields.io/github/v/release/HeraldoAntunes/amplia?include_prereleases&label=pr%C3%A9-lan%C3%A7amento" alt="Pré-lançamento"></a>
   <a href="https://github.com/HeraldoAntunes/amplia/releases"><img src="https://img.shields.io/github/downloads/HeraldoAntunes/amplia/total?label=downloads" alt="Downloads"></a>
 </p>
 
 <p align="center">
-  <a href="https://github.com/HeraldoAntunes/amplia/releases/tag/v0.5.0-rc.2"><b>⬇ Baixar o Amplia para testar</b></a>
+  <a href="https://github.com/HeraldoAntunes/amplia/releases/tag/v0.6.0-rc.1"><b>⬇ Baixar o Amplia para testar</b></a>
   &nbsp;·&nbsp; <a href="docs/GUIA-DE-USO.md">Guia de uso</a>
   &nbsp;·&nbsp; <a href="#programas-livres-">Programas Livres</a>
 </p>
@@ -36,15 +36,14 @@ Imprima ou salve o PDF. Livre, gratuito e sem internet.</p>
 
 ### Qual arquivo baixar?
 
-Pré-lançamento disponível: **0.5.0-rc.2**, para testes. O ZIP mostra o código **0.5.0 · em teste**.
+Pré-lançamento atual: **0.6.0-rc.1**, para testes. O programa mostra o código **0.6.0 · em teste**.
 
-**Desenvolvimento 0.6.0:** as telas e orientações abaixo descrevem a nova montagem sem recorte,
-ainda em preparação. O ZIP 0.5.0-rc.2 usa a montagem anterior. A nova versão será distribuída
-como candidata de teste, após as verificações.
+Esta candidata inclui os dois modos de montagem sem recorte. A geometria, os PDFs e a impressão
+virtual foram conferidos; a clareza e o alinhamento na montagem em papel ainda precisam de avaliação.
 
 | Para quê | Baixar |
 |---|---|
-| **Usar sem instalar no Windows, inclusive em pendrive** | [**Amplia-0.5.0-rc.2-portatil.zip**](https://github.com/HeraldoAntunes/amplia/releases/download/v0.5.0-rc.2/Amplia-0.5.0-rc.2-portatil.zip) |
+| **Usar sem instalar no Windows, inclusive em pendrive** | [**Amplia-0.6.0-rc.1-portatil.zip**](https://github.com/HeraldoAntunes/amplia/releases/download/v0.6.0-rc.1/Amplia-0.6.0-rc.1-portatil.zip) |
 
 Extraia o ZIP inteiro e abra **Amplia.exe**, dentro da pasta **Amplia**. Mantenha as pastas `app` e `runtime`
 junto do executável. O Python já acompanha o pacote; não é preciso instalá-lo no computador.
@@ -59,7 +58,7 @@ junto do executável. O Python já acompanha o pacote; não é preciso instalá-
 
 ## Como baixar e usar no Windows
 
-1. Abra a [página da candidata](https://github.com/HeraldoAntunes/amplia/releases/tag/v0.5.0-rc.2) e baixe o ZIP portátil.
+1. Abra a [página da candidata](https://github.com/HeraldoAntunes/amplia/releases/tag/v0.6.0-rc.1) e baixe o ZIP portátil.
 2. Clique com o botão direito no ZIP e escolha **Extrair tudo**. Abra a pasta extraída e depois **Amplia.exe**.
 3. Na aba **Imagem**, use **Escolher imagem…** para navegar pelas pastas e unidades do computador.
 4. Na aba **Folhas**, escolha um atalho de tamanho ou informe quantas folhas quer na horizontal e na vertical.
@@ -70,11 +69,11 @@ escolha outro nome. Ainda não há instalador nem atualização automática.
 
 ### Conferir o arquivo baixado
 
-Baixe também o [SHA256SUMS.txt](https://github.com/HeraldoAntunes/amplia/releases/download/v0.5.0-rc.2/SHA256SUMS.txt).
+Baixe também o [SHA256SUMS.txt](https://github.com/HeraldoAntunes/amplia/releases/download/v0.6.0-rc.1/SHA256SUMS.txt).
 Na pasta do download, execute:
 
 ```powershell
-certutil -hashfile Amplia-0.5.0-rc.2-portatil.zip SHA256
+certutil -hashfile Amplia-0.6.0-rc.1-portatil.zip SHA256
 ```
 
 Compare o resultado com a linha do ZIP no arquivo de somas. Os anexos também têm assinatura Sigstore,
@@ -193,7 +192,7 @@ A arquitetura está em [docs/ARQUITETURA.md](docs/ARQUITETURA.md); os componente
 
 ### Desenvolver e usar por comandos
 
-Versão em preparação: 0.6.0. A candidata disponível para avaliação é a 0.5.0-rc.2.
+Versão em preparação: 0.6.0. A candidata disponível para avaliação é a 0.6.0-rc.1.
 
 Para trabalhar com o código, consulte os requisitos em [requirements.txt](requirements.txt) e as versões validadas
 em [requirements-validado.txt](requirements-validado.txt). A montagem do portátil foi preparada para Python 3.14/Tk 9
@@ -231,7 +230,7 @@ Sugestões e correções são bem-vindas. Veja [CONTRIBUTING.md](.github/CONTRIB
 
 Cite o pré-lançamento e a revisão utilizados. Os dados estão em [CITATION.cff](CITATION.cff); o GitHub oferece
 **Cite this repository** para gerar uma referência. A candidata atual é a
-[0.5.0-rc.2](https://github.com/HeraldoAntunes/amplia/releases/tag/v0.5.0-rc.2).
+[0.6.0-rc.1](https://github.com/HeraldoAntunes/amplia/releases/tag/v0.6.0-rc.1).
 
 ## Como foi feito
 
@@ -258,4 +257,4 @@ Cada um funciona sozinho, sem internet e sem conta.
 | <img src="https://raw.githubusercontent.com/HeraldoAntunes/giz-na-tela/main/docs/img/icone.png" alt="" width="36"> | **Giz na Tela** | Escrever por cima de qualquer programa aberto no computador | [GitHub](https://github.com/HeraldoAntunes/giz-na-tela) | [Baixar](https://github.com/HeraldoAntunes/giz-na-tela/releases/latest) |
 | <img src="https://raw.githubusercontent.com/HeraldoAntunes/bancada-livre/main/src/assets/icone.svg" alt="" width="36"> | **Bancada Livre** | Simulador de lógica digital: portas, CIs 74xx, flip-flops e tabela-verdade | [GitHub](https://github.com/HeraldoAntunes/bancada-livre) | [Baixar](https://github.com/HeraldoAntunes/bancada-livre/releases/latest) |
 | <img src="https://raw.githubusercontent.com/HeraldoAntunes/tarja-livre/main/docs/img/icone.svg" alt="" width="36"> | **Tarja Livre** | Tarjar dados pessoais em PDF sem internet, de um jeito que a tarja não sai | [GitHub](https://github.com/HeraldoAntunes/tarja-livre) | [Baixar](https://github.com/HeraldoAntunes/tarja-livre/releases/latest) |
-| <img src="https://raw.githubusercontent.com/HeraldoAntunes/amplia/main/docs/img/icone.png" alt="" width="36"> | **Amplia** | **Ampliar imagens em pôsteres para imprimir em folhas A4 · você está aqui** | [GitHub](https://github.com/HeraldoAntunes/amplia) | [Testar](https://github.com/HeraldoAntunes/amplia/releases/tag/v0.5.0-rc.2) |
+| <img src="https://raw.githubusercontent.com/HeraldoAntunes/amplia/main/docs/img/icone.png" alt="" width="36"> | **Amplia** | **Ampliar imagens em pôsteres para imprimir em folhas A4 · você está aqui** | [GitHub](https://github.com/HeraldoAntunes/amplia) | [Testar](https://github.com/HeraldoAntunes/amplia/releases/tag/v0.6.0-rc.1) |
