@@ -4,7 +4,7 @@ type: software
 title: "Amplia: pôsteres em folhas A4"
 abstract: "Aplicativo local para ampliar imagens, dividir em folhas A4 e exportar PDF para impressão, com interface nativa e comandos JSON."
 version: "0.6.1"
-date-released: "2026-11-01"
+date-released: "2026-11-02"
 doi: "10.5281/zenodo.23868491"
 authors:
   - given-names: "Heraldo"
@@ -23,5 +23,5 @@ identifiers:
     value: "10.5281/zenodo.23868491"
     description: "DOI geral do Amplia, que reúne as versões no Zenodo"
   - type: doi
-    value: "10.5281/zenodo.23868492"
-    description: "DOI específico da candidata v0.6.0-rc.1"
+    value: "10.5281/zenodo.23873515"
+    description: "DOI específico da candidata v0.6.1-rc.1"

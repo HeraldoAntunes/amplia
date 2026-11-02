@@ -206,7 +206,7 @@ A arquitetura está em [docs/ARQUITETURA.md](docs/ARQUITETURA.md); os componente
 ### Desenvolver e usar por comandos
 
 Versão em preparação: 0.6.1, com o ícone de duas folhas, da menor para a maior.
-A candidata preparada para publicação é a 0.6.1-rc.1.
+A candidata publicada disponível para avaliação é a 0.6.1-rc.1.
 
 Para trabalhar com o código, consulte os requisitos em [requirements.txt](requirements.txt) e as versões validadas
 em [requirements-validado.txt](requirements-validado.txt). A montagem do portátil foi preparada para Python 3.14/Tk 9
@@ -245,10 +245,10 @@ Sugestões e correções são bem-vindas. Veja [CONTRIBUTING.md](.github/CONTRIB
 O Amplia está arquivado no Zenodo. O **DOI geral**, que reúne as versões, é
 [10.5281/zenodo.23868491](https://doi.org/10.5281/zenodo.23868491).
 
-A candidata anterior **0.6.0-rc.1** tem o DOI específico
-[10.5281/zenodo.23868492](https://doi.org/10.5281/zenodo.23868492):
+Para citar a candidata **0.6.1-rc.1**, use o DOI específico
+[10.5281/zenodo.23873515](https://doi.org/10.5281/zenodo.23873515):
 
-> Antunes, H. (2026). *Amplia: pôsteres em folhas A4* (v0.6.0-rc.1) [Software]. Zenodo. https://doi.org/10.5281/zenodo.23868492
+> Antunes, H. (2026). *Amplia: pôsteres em folhas A4* (v0.6.1-rc.1) [Software]. Zenodo. https://doi.org/10.5281/zenodo.23873515
 
 Os metadados estão em [CITATION.cff](CITATION.cff); o GitHub oferece **Cite this repository**.
 O DOI identifica o registro arquivado e não muda a situação desta versão, que continua em teste.
