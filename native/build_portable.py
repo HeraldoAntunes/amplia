@@ -26,7 +26,7 @@ def copy_documentation(target):
              'docs/img/icone.png', 'docs/img/fluxo.png', 'docs/img/capa.png',
              'docs/LICENCA-traducao-pt-BR.md', 'docs/VITRINE.md',
              'docs/img/capa-social.png', 'docs/img/capa-quadro.png', 'docs/img/bandeira-brasil.svg',
-             'docs/img/cartaz-geometria.png', 'docs/img/folhas.png', 'docs/img/imprimir-pdf.png',
+             'docs/img/folhas.png', 'docs/img/imprimir-pdf.png',
              'docs/img/folha-individual.png', 'docs/img/montagem.png', 'docs/img/folhas-inteiras.png']
     for name in names:
         destination = target / name
@@ -115,7 +115,9 @@ def main():
     for name in ['LICENSE', 'THIRD-PARTY-NOTICES.md']:
         shutil.copy2(ROOT / name, TARGET / name)
     shutil.copy2(ROOT / 'native' / 'boot.py', app / 'boot.py')
-    (app / 'examples').mkdir(exist_ok=True); shutil.copy2(ROOT / 'examples' / 'demo.png', app / 'examples' / 'demo.png')
+    (app / 'examples').mkdir(exist_ok=True)
+    for name in ['demo.png', 'mapa-serra-clara.png', 'peca-suporte.png', 'festa-entre-estrelas.png', 'README.md']:
+        shutil.copy2(ROOT / 'examples' / name, app / 'examples' / name)
     (app / 'output').mkdir(exist_ok=True)
     copy_documentation(TARGET)
     for base in ('app/img', 'docs/img'):

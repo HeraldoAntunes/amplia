@@ -20,24 +20,36 @@ os controles do Amplia.
 reconstruída para a imagem. O gerador apenas coloca essa captura e o ícone no
 layout. O aplicativo continua identificado como versão de teste nas próprias telas.
 
-## Exemplo didático
+## Exemplos
 
-O cartaz **Geometria: áreas e perímetros** é próprio e tem 3244 × 1480 px.
-Usa três figuras com cálculos verificáveis: retângulo de 12 × 8 cm, quadrado
-de lado 8 cm e triângulo retângulo de lados 9, 12 e 15 cm.
+A capa e a galeria usam o **Mapa Serra Clara**, 3244 × 1480 px: relevo sintético,
+curvas de nível de 20 em 20 metros, trilha e mirantes. O mapa é fictício e não
+georreferenciado. É gerado por `examples/criar_exemplos.py`, junto do desenho
+**Suporte de fixação**, com cotas e perspectiva ilustrativas. O mapa é também
+`examples/demo.png`, aberto pelo botão de exemplo existente.
 
-Foi preparado para **3 colunas e 2 linhas de A4 em paisagem**, margem de
-10 mm e sobreposição de 10 mm, no modo com dobra. Isso produz um pôster de **811 × 370 mm**.
-Nessa configuração, os 400 px da régua correspondem a 100 mm no arquivo;
-a confirmação da medida em papel exige impressão física. Outra configuração
-muda a escala dos desenhos.
+O cartaz **Festa entre estrelas** foi gerado com a ferramenta de imagens da
+OpenAI, sem imagem de referência, e revisado visualmente. O pedido descreveu
+um cartaz horizontal de aniversário em ilustração de papel e guache, fundo
+azul noturno, foguete verde, planetas e balões, com os textos “FESTA ENTRE
+ESTRELAS”, “Uma aventura para comemorar!”, “Prepare o espaço. A diversão vai
+decolar.” e “EXEMPLO FICTÍCIO”, sem nomes, datas, marcas ou personagens conhecidos.
+A imagem pronta é distribuída; o script não a regenera.
+
+Os três arquivos acompanham o portátil em `app/examples`. A documentação e as
+limitações ficam em [examples/README.md](../examples/README.md). O programa não
+usa IA ou conexão para abrir esses arquivos.
+
+Na captura principal: **3 colunas × 2 linhas de A4 em paisagem**, margens de
+10 mm e repetição de 10 mm, modo com dobra. A imagem permanece inteira; a escala
+gráfica do desenho é ilustrativa e muda de tamanho junto com o pôster.
 
 ## Reproduzir
 
 Use uma cópia de desenvolvimento e uma tela ou ambiente de teste de pelo menos
 1920 × 1080, com Python, Tk e Pillow já disponíveis.
 
-1. Gere o cartaz: `python scripts/criar_vitrine.py --so-exemplo`.
+1. Gere mapa e peça: `python scripts/criar_vitrine.py --so-exemplo`.
 2. Capture o programa: `python scripts/capturar_vitrine.py`.
 3. Gere as capas: `python scripts/criar_vitrine.py`.
 
@@ -45,8 +57,9 @@ O capturador abre uma sessão nova com o cartaz sintético, escolhe as seis folh
 visita as abas e a ajuda e fecha somente a sessão criada por ele. Não usa imagens
 pessoais. Os arquivos ficam em `docs/img`.
 
-As fotos mostram o código 0.6.0 em teste, em Windows 11 virtual; o README distingue
-essa preparação do ZIP anterior disponível. A galeria inclui os dois modos.
+As fotos locais mostram o código 0.6.1 em teste, com o ícone de duas folhas,
+em Windows 11 virtual; o README distingue essa preparação da candidata
+0.6.1-rc.1 preparada para publicação. Capa e prévia social foram regeneradas com o ícone aprovado. A galeria inclui os dois modos.
 A capa foi conferida no tamanho original, em miniatura (820 e 410 px) e sobre fundo escuro.
 A prévia social é o arquivo `capa-social.png`; seu envio nas configurações do
 repositório é uma ação separada.
@@ -58,3 +71,10 @@ No README, usa 20 × 14 px ao lado do nome. Sua origem consta em
 [THIRD-PARTY-NOTICES.md](../THIRD-PARTY-NOTICES.md).
 O ícone, o cartaz e o layout do gerador são distribuídos sob a licença do código
 próprio. As fontes Segoe UI são acessadas no Windows, não incluídas no projeto.
+
+## Ícone
+
+Uma folha menor na origem da seta e uma maior no destino representam a ampliação.
+A paleta e a seta anteriores foram mantidas. SVG/PNG/ICO são gerados por
+`native/gerar_icone.py`. O ícone entra também no recurso dos dois executáveis,
+que precisam ser recompilados quando o ICO mudar.

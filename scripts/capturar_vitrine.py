@@ -30,7 +30,7 @@ def main():
         x,y=root.winfo_rootx(),root.winfo_rooty()
         ImageGrab.grab(bbox=(x,y,x+root.winfo_width(),y+root.winfo_height())).save(out/(name+'.png'))
     try:
-        app.path.set(str(ROOT/'docs/img/cartaz-geometria.png'));app.open_path();wait()
+        app.path.set(str(ROOT/'examples/mapa-serra-clara.png'));app.open_path();wait()
         app._syncing=True;app.orientation.set('Deitadas (paisagem)')
         app.sheet_values['colunas'].set('3');app.sheet_values['linhas'].set('2');app._syncing=False
         app.configure_poster();wait()

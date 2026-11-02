@@ -2,6 +2,13 @@
 
 ## Em desenvolvimento
 
+## 0.6.1 · Pré-lançamento para testes
+
+- Ícone com duas folhas de tamanhos diferentes, indicando a ampliação da menor para a maior.
+- Mantém o fundo verde, as cores e a seta de ampliação.
+- Exemplo inicial com mapa de trilhas e curvas de nível.
+- Inclui desenho técnico de uma peça e cartaz de aniversário para experimentar.
+
 ## 0.6.0 · Pré-lançamento para testes
 
 - Dois modos de montagem sem tesoura: dobrar margens para trás ou unir folhas inteiras com faixas brancas.

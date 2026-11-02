@@ -1,9 +1,9 @@
 cff-version: 1.2.0
-message: "Ao citar o Amplia, informe o pré-lançamento e a revisão utilizados."
+message: "Ao citar o Amplia, informe a candidata de teste e a revisão utilizadas."
 type: software
 title: "Amplia: pôsteres em folhas A4"
 abstract: "Aplicativo local para ampliar imagens, dividir em folhas A4 e exportar PDF para impressão, com interface nativa e comandos JSON."
-version: "0.6.0"
+version: "0.6.1"
 date-released: "2026-11-01"
 doi: "10.5281/zenodo.23868491"
 authors:
