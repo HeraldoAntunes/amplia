@@ -89,7 +89,7 @@ em paisagem**, no modo com dobra, com 10 mm de margem e de sobreposição. A gra
 |---|---|
 | ![Mapa Serra Clara com prévia das seis folhas A4](docs/img/folhas.png) | ![Aba Imprimir e PDF com botões separados para as duas ações](docs/img/imprimir-pdf.png) |
 | **Conferir uma folha individual** | **Entender a dobra e a montagem (correção em preparação)** |
-| ![Segunda folha do mapa, com a área que será impressa e as guias de montagem](docs/img/folha-individual.png) | <img src="docs/img/montagem.png?v=mapa-062" alt="Ajuda de montagem com mapa, preparada para a versão 0.6.2"> |
+| ![Segunda folha do mapa, com a área que será impressa e as guias de montagem](docs/img/folha-individual.png) | <img src="docs/img/montagem-mapa.png" alt="Ajuda de montagem com mapa, preparada para a versão 0.6.2"> |
 
 A imagem de montagem mostra a correção preparada para a **0.6.2**. O download disponível
 continua na **0.6.1-rc.1**; essa correção ainda não entrou no pacote publicado.

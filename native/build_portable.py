@@ -27,7 +27,7 @@ def copy_documentation(target):
              'docs/LICENCA-traducao-pt-BR.md', 'docs/VITRINE.md',
              'docs/img/capa-social.png', 'docs/img/capa-quadro.png', 'docs/img/bandeira-brasil.svg',
              'docs/img/folhas.png', 'docs/img/imprimir-pdf.png',
-             'docs/img/folha-individual.png', 'docs/img/montagem.png', 'docs/img/folhas-inteiras.png']
+             'docs/img/folha-individual.png', 'docs/img/montagem.png', 'docs/img/montagem-mapa.png', 'docs/img/folhas-inteiras.png']
     for name in names:
         destination = target / name
         destination.parent.mkdir(parents=True, exist_ok=True)
