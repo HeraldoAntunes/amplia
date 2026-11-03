@@ -75,7 +75,8 @@ e os sinais **+** de alinhamento, e foram essas que foram medidas.
 | Sinal **+** de alinhamento | na folha anterior, onde chega a borda dobrada da vizinha | x = largura - margem - faixa: 190 mm (retrato) e 277 mm (paisagem), nas duas combinações; y = altura - margem - faixa para a linha de baixo |
 | Continuidade do desenho | o ponto do **+** em A1 mostra o mesmo desenho que o início de A2 | cores iguais (diferença de até 6 em 255) em 1, 3 e 5 mm além do sinal |
 | Folhas inteiras | sem tracejado; desenho continua sem repetir | nenhum tracejado; a borda de A1 e o início de A2 têm cores vizinhas |
-| Guias fora do desenho | guias só na margem branca | nenhum sinal **+** dentro da área da imagem |
+| Guias fora do desenho | guias só na margem branca | nenhum segmento de tracejado ou de sinal **+** cruza a área útil, nos dois modos |
+| Imagem presente em cada folha | toda folha com parte do desenho mostra a imagem | imagem encontrada em todas as 48 folhas; uma folha sem imagem conta como falha |
 
 **Carta, A3 e Letter:** `poster.configurar` com `papel` é recusado com `PARAMETRO_DESCONHECIDO`
 ("Parâmetro não reconhecido."). O README, o guia e o catálogo de comandos só falam em A4, então

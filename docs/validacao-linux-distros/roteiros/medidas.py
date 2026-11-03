@@ -106,9 +106,11 @@ for c in casos:
         x0, x1 = max(folha['x_mm'], box['x']), min(folha['x_mm'] + folha['largura_mm'], box['x'] + box['largura'])
         y0, y1 = max(folha['y_mm'], box['y']), min(folha['y_mm'] + folha['altura_mm'], box['y'] + box['altura'])
         esperado = (m + x0 - folha['x_mm'], m + y0 - folha['y_mm'], m + x1 - folha['x_mm'], m + y1 - folha['y_mm'])
-        if caixa:
-            checar(all(abs(a - b) < 0.6 for a, b in zip(caixa, esperado)),
-                   f'{nome} {folha["codigo"]}: área da imagem {tuple(round(v, 2) for v in caixa)} esperada {esperado}')
+        tem_imagem = esperado[2] > esperado[0] and esperado[3] > esperado[1]
+        if checar(caixa is not None or not tem_imagem, f'{nome} {folha["codigo"]}: imagem ausente na folha; esperada {esperado}'):
+            if caixa is not None:
+                checar(all(abs(a - b) < 0.6 for a, b in zip(caixa, esperado)),
+                       f'{nome} {folha["codigo"]}: área da imagem {tuple(round(v, 2) for v in caixa)} esperada {esperado}')
         # Guias vetoriais.
         tracejadas, sinais = [], []
         for d in page.get_drawings():
@@ -139,10 +141,13 @@ for c in casos:
                        f'{nome} {folha["codigo"]}: falta sinal + horizontal em y={y_alvo}')
         else:
             checar(not tracejadas, f'{nome} {folha["codigo"]}: tracejado no modo inteiras')
-        # Guias não invadem a imagem.
+        # Guias não invadem a área útil (o segmento inteiro, nos dois modos).
+        ux0, uy0, ux1, uy1 = m + .3, m + .3, m + folha['largura_mm'] - .3, m + folha['altura_mm'] - .3
         for t in tracejadas + sinais:
-            dentro = (m + .3 < t[0] < m + folha['largura_mm'] - .3 and m + .3 < t[1] < m + folha['altura_mm'] - .3)
-            checar(not dentro or (c['montagem'] == 'dobrar'), f'{nome} {folha["codigo"]}: guia dentro da imagem {t}')
+            sx0, sx1 = sorted((t[0], t[2]))
+            sy0, sy1 = sorted((t[1], t[3]))
+            dentro = sx0 < ux1 and sx1 > ux0 and sy0 < uy1 and sy1 > uy0
+            checar(not dentro, f'{nome} {folha["codigo"]}: guia dentro da área útil {t}')
     # Continuidade entre A1 e A2: o ponto onde chega a borda dobrada de A2 mostra o mesmo desenho em A1.
     a1, a2 = pixes[0], pixes[1]
     y = m + 60
