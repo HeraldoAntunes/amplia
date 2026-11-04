@@ -23,5 +23,5 @@ identifiers:
     value: "10.5281/zenodo.23868491"
     description: "DOI geral do Amplia, que reúne as versões no Zenodo"
   - type: doi
-    value: "10.5281/zenodo.23873515"
-    description: "DOI específico da candidata v0.6.1-rc.1"
+    value: "10.5281/zenodo.23963698"
+    description: "DOI específico da candidata v0.6.5-rc.1"

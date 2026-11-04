@@ -266,10 +266,10 @@ Sugestões e correções são bem-vindas. Veja [CONTRIBUTING.md](.github/CONTRIB
 O Amplia está arquivado no Zenodo. O **DOI geral**, que reúne as versões, é
 [10.5281/zenodo.23868491](https://doi.org/10.5281/zenodo.23868491).
 
-Para citar a candidata **0.6.1-rc.1**, use o DOI específico
-[10.5281/zenodo.23873515](https://doi.org/10.5281/zenodo.23873515):
+Para citar a candidata **0.6.5-rc.1**, use o DOI específico
+[10.5281/zenodo.23963698](https://doi.org/10.5281/zenodo.23963698):
 
-> Antunes, H. (2026). *Amplia: pôsteres em folhas A4* (v0.6.1-rc.1) [Software]. Zenodo. https://doi.org/10.5281/zenodo.23873515
+> Antunes, H. (2026). *Amplia: pôsteres em folhas A4* (v0.6.5-rc.1) [Software]. Zenodo. https://doi.org/10.5281/zenodo.23963698
 
 Os metadados estão em [CITATION.cff](CITATION.cff); o GitHub oferece **Cite this repository**.
 O DOI identifica o registro arquivado e não muda a situação desta versão, que continua em teste.
