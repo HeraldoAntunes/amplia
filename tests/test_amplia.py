@@ -3,6 +3,7 @@ import base64
 import io
 import json
 import math
+import os
 from pathlib import Path
 import subprocess
 import sys
@@ -327,6 +328,64 @@ class HTTPTests(Fixture):
         with self.assertRaises(urllib.error.HTTPError) as caught:
             urllib.request.urlopen(origin + '/poster.pdf')
         caught.exception.close()
+
+
+class ImageInputTests(unittest.TestCase):
+    def test_16_bit_png_keeps_tones_and_transparency(self):
+        source = Image.new('I;16', (5, 1))
+        source.putdata([0, 20000, 20001, 32768, 65535])
+        raw = io.BytesIO()
+        source.save(raw, 'PNG', transparency=20000)
+        engine = Amplia()
+        result = engine.execute({'comando': 'imagem.abrir', 'parametros': {
+            'dados_base64': base64.b64encode(raw.getvalue()).decode('ascii')}})
+        self.assertTrue(result['ok'], result)
+        self.assertEqual([engine.image.getpixel((x, 0)) for x in range(5)],
+                         [(gray,) * 3 for gray in (0, 255, 78, 128, 255)])
+
+    def test_16_bit_big_endian_tiff_keeps_gray_in_pdf(self):
+        source = Image.new('I;16B', (30, 20), 20000)
+        raw = io.BytesIO()
+        source.save(raw, 'TIFF')
+        engine = Amplia()
+        result = engine.execute({'comando': 'imagem.abrir', 'parametros': {
+            'dados_base64': base64.b64encode(raw.getvalue()).decode('ascii')}})
+        self.assertTrue(result['ok'], result)
+        page = PdfReader(io.BytesIO(engine.pdf_bytes())).pages[0]
+        self.assertEqual(page.images[0].image.getpixel((15, 10)), (78, 78, 78))
+
+    @unittest.skipUnless(os.name == 'posix', 'Nomes com bytes brutos exigem sistema de arquivos POSIX.')
+    def test_legacy_filename_keeps_stdio_session_and_round_trips(self):
+        with tempfile.TemporaryDirectory() as directory:
+            raw_path = os.fsencode(directory) + b'/caf\xe9.png'
+            with open(raw_path, 'wb') as output:
+                output.write(image_bytes())
+            requests = [
+                {'comando': 'imagem.abrir', 'parametros': {'caminho': os.fsdecode(raw_path)}},
+                {'comando': 'estado.obter'},
+            ]
+            process = subprocess.run([sys.executable, str(ROOT / 'amplia.py'), '--stdio'],
+                                     input=''.join(json.dumps(request) + '\n' for request in requests),
+                                     capture_output=True, text=True, encoding='utf-8', timeout=30)
+            self.assertEqual(process.returncode, 0, process.stderr)
+            first, second = map(json.loads, process.stdout.splitlines())
+            self.assertTrue(first['ok'], first)
+            self.assertTrue(second['ok'], second)
+            self.assertEqual(first['resultado'], second['resultado'])
+            self.assertEqual(os.fsencode(second['resultado']['imagem']['nome']), b'caf\xe9.png')
+
+    def test_missing_image_has_own_code_and_keeps_state(self):
+        engine = Amplia()
+        original = engine.execute({'comando': 'imagem.abrir', 'parametros': {
+            'dados_base64': base64.b64encode(image_bytes()).decode('ascii')}})['resultado']
+        with tempfile.TemporaryDirectory() as directory:
+            for path, code in [(Path(directory) / 'ausente.png', 'IMAGEM_NAO_ENCONTRADA'),
+                               (Path(directory), 'IMAGEM_NAO_E_ARQUIVO')]:
+                with self.subTest(code=code):
+                    result = engine.execute({'comando': 'imagem.abrir', 'parametros': {'caminho': str(path)}})
+                    self.assertFalse(result['ok'])
+                    self.assertEqual(result['erro']['codigo'], code)
+                    self.assertEqual(engine.state(), original)
 
 
 if __name__ == '__main__':

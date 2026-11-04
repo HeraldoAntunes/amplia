@@ -8,7 +8,7 @@ Escolha a imagem, defina quantas folhas quer usar e confira a montagem.<br>
 Imprima ou salve o PDF. Livre, gratuito e sem internet.</p>
 
 <p align="center">
-  <img src="https://img.shields.io/badge/feito%20em-Python-555" alt="Feito em Python">
+  <img src="https://img.shields.io/badge/feito%20em-Python-3572A5?logo=python&logoColor=white" alt="Feito em Python">
   <a href="#sistemas"><img src="https://img.shields.io/badge/testado%20no-Windows%2011%20%28VM%29-0078D6" alt="Testado no Windows 11 em máquina virtual"></a>
   <img src="https://img.shields.io/badge/internet-n%C3%A3o%20precisa-2b8a3e" alt="Não precisa de internet">
   <a href="LICENSE"><img src="https://img.shields.io/badge/licen%C3%A7a-MIT-blue" alt="Licença MIT"></a>
@@ -17,12 +17,12 @@ Imprima ou salve o PDF. Livre, gratuito e sem internet.</p>
   <a href="https://github.com/HeraldoAntunes/amplia/actions/workflows/testes.yml"><img src="https://github.com/HeraldoAntunes/amplia/actions/workflows/testes.yml/badge.svg" alt="Testes"></a>
   <a href="https://scorecard.dev/viewer/?uri=github.com/HeraldoAntunes/amplia"><img src="https://api.scorecard.dev/projects/github.com/HeraldoAntunes/amplia/badge" alt="OpenSSF Scorecard"></a>
   <a href="https://doi.org/10.5281/zenodo.23868491"><img src="https://zenodo.org/badge/DOI/10.5281/zenodo.23868491.svg" alt="DOI"></a>
-  <a href="https://github.com/HeraldoAntunes/amplia/releases/tag/v0.6.1-rc.1"><img src="https://img.shields.io/github/v/release/HeraldoAntunes/amplia?include_prereleases&label=pr%C3%A9-lan%C3%A7amento" alt="Pré-lançamento"></a>
+  <a href="https://github.com/HeraldoAntunes/amplia/releases/tag/v0.6.5-rc.1"><img src="https://img.shields.io/github/v/release/HeraldoAntunes/amplia?include_prereleases&label=pr%C3%A9-lan%C3%A7amento" alt="Pré-lançamento"></a>
   <a href="https://github.com/HeraldoAntunes/amplia/releases"><img src="https://img.shields.io/github/downloads/HeraldoAntunes/amplia/total?label=downloads" alt="Downloads"></a>
 </p>
 
 <p align="center">
-  <a href="https://github.com/HeraldoAntunes/amplia/releases/tag/v0.6.1-rc.1"><b>⬇ Baixar o Amplia para testar</b></a>
+  <a href="https://github.com/HeraldoAntunes/amplia/releases/tag/v0.6.5-rc.1"><b>⬇ Baixar o Amplia para testar</b></a>
   &nbsp;·&nbsp; <a href="docs/GUIA-DE-USO.md">Guia de uso</a>
   &nbsp;·&nbsp; <a href="#programas-livres-">Programas Livres</a>
 </p>
@@ -37,14 +37,14 @@ Imprima ou salve o PDF. Livre, gratuito e sem internet.</p>
 
 ### Qual arquivo baixar?
 
-Pré-lançamento atual: **0.6.1-rc.1**, para testes. O programa mostra o código **0.6.1 · em teste**.
+Pré-lançamento atual: **0.6.5-rc.1**, para testes. O programa mostra **Versão 0.6.5 · em teste**.
 
 Esta candidata inclui os dois modos de montagem sem recorte. A geometria, os PDFs e a impressão
 virtual foram conferidos; a clareza e o alinhamento na montagem em papel ainda precisam de avaliação.
 
 | Para quê | Baixar |
 |---|---|
-| **Usar sem instalar no Windows, inclusive em pendrive** | [**Amplia-0.6.1-rc.1-portatil.zip**](https://github.com/HeraldoAntunes/amplia/releases/download/v0.6.1-rc.1/Amplia-0.6.1-rc.1-portatil.zip) |
+| **Usar sem instalar no Windows, inclusive em pendrive** | [**Amplia-0.6.5-rc.1-portatil.zip**](https://github.com/HeraldoAntunes/amplia/releases/download/v0.6.5-rc.1/Amplia-0.6.5-rc.1-portatil.zip) |
 
 Extraia o ZIP inteiro e abra **Amplia.exe**, dentro da pasta **Amplia**. Mantenha as pastas `app` e `runtime`
 junto do executável. O Python já acompanha o pacote; não é preciso instalá-lo no computador.
@@ -59,7 +59,7 @@ junto do executável. O Python já acompanha o pacote; não é preciso instalá-
 
 ## Como baixar e usar no Windows
 
-1. Abra a [página da candidata](https://github.com/HeraldoAntunes/amplia/releases/tag/v0.6.1-rc.1) e baixe o ZIP portátil.
+1. Abra a [página da candidata](https://github.com/HeraldoAntunes/amplia/releases/tag/v0.6.5-rc.1) e baixe o ZIP portátil.
 2. Clique com o botão direito no ZIP e escolha **Extrair tudo**. Abra a pasta extraída e depois **Amplia.exe**.
 3. Na aba **Imagem**, use **Escolher imagem…** para navegar pelas pastas e unidades do computador.
 4. Na aba **Folhas**, escolha um atalho de tamanho ou informe quantas folhas quer na horizontal e na vertical.
@@ -70,11 +70,11 @@ escolha outro nome. Ainda não há instalador nem atualização automática.
 
 ### Conferir o arquivo baixado
 
-Baixe também o [SHA256SUMS.txt](https://github.com/HeraldoAntunes/amplia/releases/download/v0.6.1-rc.1/SHA256SUMS.txt).
+Baixe também o [SHA256SUMS.txt](https://github.com/HeraldoAntunes/amplia/releases/download/v0.6.5-rc.1/SHA256SUMS.txt).
 Na pasta do download, execute:
 
 ```powershell
-certutil -hashfile Amplia-0.6.1-rc.1-portatil.zip SHA256
+certutil -hashfile Amplia-0.6.5-rc.1-portatil.zip SHA256
 ```
 
 Compare o resultado com a linha do ZIP no arquivo de somas. Os anexos também têm assinatura Sigstore,
@@ -82,17 +82,15 @@ identificada pelos arquivos `.sigstore.json`. Veja a [política de segurança](.
 
 ## Como é
 
-As telas abaixo são capturas do aplicativo, com um mapa fictício de trilhas e curvas de nível. O exemplo usa **3 × 2 = 6 folhas A4
+As capturas abaixo foram feitas na 0.6.2, com um mapa fictício de trilhas e curvas de nível.
+As versões seguintes só ajustaram o espaço dos botões em telas menores. O exemplo usa **3 × 2 = 6 folhas A4
 em paisagem**, no modo com dobra, com 10 mm de margem e de sobreposição. A grade verde aparece somente na prévia.
 
 | Escolher as folhas e conferir o pôster | Imprimir ou salvar o PDF |
 |---|---|
 | ![Mapa Serra Clara com prévia das seis folhas A4](docs/img/folhas.png) | ![Aba Imprimir e PDF com botões separados para as duas ações](docs/img/imprimir-pdf.png) |
-| **Conferir uma folha individual** | **Entender a dobra e a montagem (correção em preparação)** |
-| ![Segunda folha do mapa, com a área que será impressa e as guias de montagem](docs/img/folha-individual.png) | <img src="docs/img/montagem-mapa.png" alt="Ajuda de montagem com mapa, preparada para a versão 0.6.2"> |
-
-A imagem de montagem mostra a correção preparada para a **0.6.2**. O download disponível
-continua na **0.6.1-rc.1**; essa correção ainda não entrou no pacote publicado.
+| **Conferir uma folha individual** | **Entender a dobra e a montagem** |
+| ![Segunda folha do mapa, com a área que será impressa e as guias de montagem](docs/img/folha-individual.png) | <img src="docs/img/montagem-mapa.png" alt="Ajuda de montagem com o mapa nos dois modos"> |
 
 ### Exemplos para experimentar
 
@@ -149,7 +147,28 @@ O programa distingue a medida do desenho do tamanho dos papéis montados. Veja
 
 - **Windows 11 x64:** testado em máquina virtual, com prévia, PDF, impressão virtual e o portátil extraído em outra pasta.
 - **CI no GitHub:** compila e testa o portátil em Windows Server 2025.
-- **Linux e macOS:** não validados. A impressão direta desta distribuição usa o Windows.
+- **Linux pelo código-fonte:** Python 3.11 ou mais recente, com Tkinter para a interface. A validação inicial de instalação e PDF usou Ubuntu 24.04 e uma imagem Debian 12 com Python 3.11. [Relatório da validação Linux](https://github.com/HeraldoAntunes/amplia/blob/7fb4336a56efec12959e2d69d8f6b683cd7ce88d/docs/VALIDACAO-LINUX.md).
+- **macOS:** teste pendente. A impressão direta integrada usa o Windows. No Linux, salve o PDF e imprima pelo leitor do sistema.
+
+### Usar pelo código no Linux
+
+Em Ubuntu 24.04 ou Debian 12, instale `python3`, `python3-venv` e `python3-tk`
+pelos repositórios do sistema. Na pasta do código, confira a versão antes de
+preparar o ambiente:
+
+```sh
+python3 --version
+python3 -m venv .venv
+. .venv/bin/activate
+python -m pip install -r requirements.txt
+python amplia_desktop.py
+```
+
+No **Ubuntu 22.04**, o Python padrão é 3.10. Use um Python 3.11 ou mais recente
+com Tkinter instalado em paralelo e use o comando desse interpretador para
+criar o ambiente virtual. Outra opção é usar Ubuntu 24.04, cujo Python do
+sistema já atende ao requisito. O [Pillow 13](https://pypi.org/project/pillow/13.0.0/)
+exige Python 3.11 ou mais recente. O portátil para Windows já inclui Python.
 
 O portátil inclui o runtime necessário. Aceita até **40 MiB e 40 milhões de pixels por imagem**, pôsteres de
 até **400 folhas** e dimensões entre **10 e 5000 mm**. A impressão direta usa raster de 300 dpi; o PDF preserva
@@ -208,8 +227,7 @@ A arquitetura está em [docs/ARQUITETURA.md](docs/ARQUITETURA.md); os componente
 
 ### Desenvolver e usar por comandos
 
-Versão em preparação: 0.6.1, com o ícone de duas folhas, da menor para a maior.
-A candidata publicada disponível para avaliação é a 0.6.1-rc.1.
+Versão em preparação: 0.6.5, publicada como pré-lançamento 0.6.5-rc.1 para testes.
 
 Para trabalhar com o código, consulte os requisitos em [requirements.txt](requirements.txt) e as versões validadas
 em [requirements-validado.txt](requirements-validado.txt). A montagem do portátil foi preparada para Python 3.14/Tk 9
@@ -258,7 +276,7 @@ O DOI identifica o registro arquivado e não muda a situação desta versão, qu
 
 ## Como foi feito
 
-Desenvolvido por **Heraldo Antunes**, com assistência de programação do **Codex, da OpenAI**, usado como ferramenta.
+Desenvolvido por **Heraldo Antunes**, com assistência de programação do **Codex, da OpenAI**, e do **Claude, da Anthropic**, usados como ferramentas.
 A direção e a responsabilidade pelo projeto são humanas. A participação de IA está descrita em [AUTORES.md](AUTORES.md).
 
 O ícone, o mapa e o desenho técnico foram desenhados para o Amplia. O cartaz de festa foi gerado com
@@ -282,4 +300,4 @@ Cada um funciona sozinho, sem internet e sem conta.
 | <img src="https://raw.githubusercontent.com/HeraldoAntunes/giz-na-tela/main/docs/img/icone.png" alt="" width="36"> | **Giz na Tela** | Escrever por cima de qualquer programa aberto no computador | [GitHub](https://github.com/HeraldoAntunes/giz-na-tela) | [Baixar](https://github.com/HeraldoAntunes/giz-na-tela/releases/latest) |
 | <img src="https://raw.githubusercontent.com/HeraldoAntunes/bancada-livre/main/src/assets/icone.svg" alt="" width="36"> | **Bancada Livre** | Simulador de lógica digital: portas, CIs 74xx, flip-flops e tabela-verdade | [GitHub](https://github.com/HeraldoAntunes/bancada-livre) | [Baixar](https://github.com/HeraldoAntunes/bancada-livre/releases/latest) |
 | <img src="https://raw.githubusercontent.com/HeraldoAntunes/tarja-livre/main/docs/img/icone.svg" alt="" width="36"> | **Tarja Livre** | Tarjar dados pessoais em PDF sem internet, de um jeito que a tarja não sai | [GitHub](https://github.com/HeraldoAntunes/tarja-livre) | [Baixar](https://github.com/HeraldoAntunes/tarja-livre/releases/latest) |
-| <img src="https://raw.githubusercontent.com/HeraldoAntunes/amplia/main/docs/img/icone.png" alt="" width="36"> | **Amplia** | **Ampliar imagens em pôsteres para imprimir em folhas A4 · você está aqui** | [GitHub](https://github.com/HeraldoAntunes/amplia) | [Testar](https://github.com/HeraldoAntunes/amplia/releases/tag/v0.6.1-rc.1) |
+| <img src="https://raw.githubusercontent.com/HeraldoAntunes/amplia/main/docs/img/icone.png" alt="" width="36"> | **Amplia** | **Ampliar imagens em pôsteres para imprimir em folhas A4 · você está aqui** | [GitHub](https://github.com/HeraldoAntunes/amplia) | [Testar](https://github.com/HeraldoAntunes/amplia/releases/tag/v0.6.5-rc.1) |

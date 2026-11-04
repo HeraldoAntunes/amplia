@@ -2,6 +2,30 @@
 
 ## Em desenvolvimento
 
+## 0.6.5 · Candidata local para testes
+
+- Preserva o brilho de imagens PNG e TIFF em tons de cinza de 16 bits.
+- Mantém a sessão de comandos aberta ao ler nomes de arquivo antigos no Linux.
+- Informa quando o arquivo da imagem não existe ou o caminho aponta para uma pasta.
+
+## 0.6.4 · Candidata local para testes
+
+- Mantém Ajustes de impressão inteiro em telas de 1366 × 768.
+- A aba Folhas pode ser rolada quando os ajustes avançados ultrapassam o espaço disponível.
+- A ajuda F1 mantém Voltar à prévia visível e permite rolar as instruções.
+
+## 0.6.3 · Candidata local para testes
+
+- Mantém os botões de navegação, PDF e impressão visíveis em telas menores.
+- Exibe os acentos no esquema da ajuda de montagem em Windows e Linux.
+- Documenta Python 3.11 ou mais recente para executar pelo código no Linux.
+- A suíte pula os três testes do driver de impressão fora do Windows.
+
+## 0.6.2 · Em preparação para testes
+
+- A ajuda de montagem usa um trecho do mapa com trilha e curvas de nível nos dois modos.
+- Capturas usam um nome de PDF correspondente ao mapa apresentado.
+
 ## 0.6.1 · Pré-lançamento para testes
 
 - Ícone com duas folhas de tamanhos diferentes, indicando a ampliação da menor para a maior.

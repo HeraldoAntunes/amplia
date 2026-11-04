@@ -3,8 +3,8 @@ message: "Ao citar o Amplia, informe a candidata de teste e a revisão utilizada
 type: software
 title: "Amplia: pôsteres em folhas A4"
 abstract: "Aplicativo local para ampliar imagens, dividir em folhas A4 e exportar PDF para impressão, com interface nativa e comandos JSON."
-version: "0.6.1"
-date-released: "2026-11-02"
+version: "0.6.5"
+date-released: "2026-11-04"
 doi: "10.5281/zenodo.23868491"
 authors:
   - given-names: "Heraldo"

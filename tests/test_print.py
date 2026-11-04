@@ -1,5 +1,6 @@
 # Amplia · © 2026 Heraldo Antunes · SPDX-License-Identifier: MIT
 import ctypes
+import sys
 import unittest
 from unittest.mock import Mock, patch
 from PIL import Image
@@ -47,6 +48,7 @@ class PrintTests(unittest.TestCase):
         gdi.StartPage.return_value = 0 if fail_page else 1
         return api, gdi, kernel
 
+    @unittest.skipUnless(sys.platform == 'win32', 'Simulação do driver Win32 de impressão.')
     def test_cancel_sends_no_job_and_keeps_configuration(self):
         api, gdi, kernel = self.driver(cancelled=True)
         before = dict(self.engine.config)
@@ -55,6 +57,7 @@ class PrintTests(unittest.TestCase):
         gdi.StartDocW.assert_not_called()
         self.assertEqual(before, self.engine.config)
 
+    @unittest.skipUnless(sys.platform == 'win32', 'Simulação do driver Win32 de impressão.')
     def test_selected_range_uses_core_page_renderer_and_releases_dc(self):
         api, gdi, kernel = self.driver()
         with patch('amplia_print.ct.WinDLL', side_effect=[api, gdi, kernel]), \
@@ -67,6 +70,7 @@ class PrintTests(unittest.TestCase):
         gdi.EndDoc.assert_called_once(); gdi.DeleteDC.assert_called_once_with(123)
         gdi.AbortDoc.assert_not_called()
 
+    @unittest.skipUnless(sys.platform == 'win32', 'Simulação do driver Win32 de impressão.')
     def test_driver_failure_aborts_started_job_and_releases_dc(self):
         api, gdi, kernel = self.driver(fail_page=True)
         with patch('amplia_print.ct.WinDLL', side_effect=[api, gdi, kernel]):

@@ -63,6 +63,17 @@ class UsabilityTests(unittest.TestCase):
         self.assertLess(x + width, self.root.winfo_screenwidth())
         self.assertLess(y + height, self.root.winfo_screenheight())
 
+    def test_pdf_actions_reserve_space_before_the_notebook(self):
+        self.open_image()
+        self.app.go_pdf()
+        self.root.update()
+        footer = self.app.back_button.master
+        self.assertEqual(footer.master.pack_slaves()[0], footer)
+        self.assertEqual(footer.pack_info()['side'], 'bottom')
+        for button in (self.app.back_button, self.app.export_button, self.app.print_button):
+            self.assertEqual(button.winfo_manager(), 'grid')
+            self.assertEqual(str(button.cget('state')), 'normal')
+
     def test_count_change_updates_preview_without_extra_click(self):
         self.open_image()
         self.app.sheet_values['colunas'].set('3')
@@ -105,7 +116,7 @@ class UsabilityTests(unittest.TestCase):
         self.open_image(); before=self.app.engine.state()
         self.app.path.set(str(self.folder/'inexistente.png')); self.app.open_path(); self.wait()
         self.assertEqual(self.app.engine.state(),before)
-        self.assertIn('Confira se o arquivo existe',self.app.status.get())
+        self.assertIn('O arquivo da imagem não foi encontrado.',self.app.status.get())
         self.assertNotIn('OPERACAO_FALHOU',self.app.status.get())
 
     def test_native_image_selection_uses_the_same_open_command(self):

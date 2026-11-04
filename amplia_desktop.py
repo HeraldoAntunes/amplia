@@ -37,29 +37,39 @@ def initial_geometry(root):
     return width, height, left + 16, top + 16
 
 
+def diagram_font(size):
+    """Escolhe uma fonte com os caracteres das instruções em português."""
+    for family in ('C:/Windows/Fonts/segoeui.ttf', 'DejaVuSans.ttf'):
+        try:
+            return ImageFont.truetype(family, size)
+        except OSError:
+            continue
+    # A fonte bitmap latina cobre os acentos. A fonte escalável embutida
+    # no Pillow pode substituir alguns deles pelo glifo de caractere ausente.
+    return ImageFont.load_default_imagefont()
+
+
 def assembly_diagram(help_data):
     """Esquema didático próprio; posições e dimensões são ilustrativas."""
     image = Image.new('RGB', (1000, 330), '#f7faf5')
     draw = ImageDraw.Draw(image)
-    def font(size):
-        path = Path('C:/Windows/Fonts/segoeui.ttf')
-        return ImageFont.truetype(str(path), size) if path.exists() else ImageFont.load_default(size=size)
     whole = help_data['montagem'] == 'inteiras'
     draw.text((25, 12), 'Folhas inteiras: encoste o papel' if whole else
               'Sem faixa repetida: encoste as imagens' if help_data['modo'] == 'borda_a_borda' else
-              'Dobre a margem esquerda de A2 para trás', font=font(26), fill=GREEN)
-    art = Image.new('RGB', (660, 150), '#f3efdc')
-    painter = ImageDraw.Draw(art)
-    painter.polygon([(0,150),(240,15),(480,150)], fill='#39764f')
-    painter.ellipse((430,20,490,80), fill='#c87a4e')
+              'Dobre a margem esquerda de A2 para trás', font=diagram_font(26), fill=GREEN)
+    # Um trecho do exemplo público permite reconhecer a continuidade nas emendas,
+    # mesmo quando a ajuda é aberta sem uma imagem pessoal na sessão.
+    with Image.open(BASE / 'examples' / 'mapa-serra-clara.png') as source:
+        art = source.convert('RGB').crop((240, 600, 2480, 1110))
+    art = art.resize((660, 150), Image.Resampling.LANCZOS)
     if whole:
         draw.rectangle((90,70,440,260),fill='white',outline='#65765f',width=2)
         draw.rectangle((440,70,790,260),fill='white',outline='#65765f',width=2)
         image.paste(art.crop((0,0,330,150)),(100,90))
         image.paste(art.crop((330,0,660,150)),(450,90))
-        draw.text((105,65),'A1',font=font(20),fill=GREEN)
-        draw.text((455,65),'A2',font=font(20),fill=GREEN)
-        draw.text((75,285),'Sem cortar, dobrar ou sobrepor. As faixas brancas ficam visíveis.',font=font(22),fill=GREEN)
+        draw.text((105,65),'A1',font=diagram_font(20),fill=GREEN)
+        draw.text((455,65),'A2',font=diagram_font(20),fill=GREEN)
+        draw.text((75,285),'Sem cortar, dobrar ou sobrepor. As faixas brancas ficam visíveis.',font=diagram_font(22),fill=GREEN)
     else:
         draw.rectangle((75,70,465,260),fill='white',outline='#65765f',width=2)
         image.paste(art.crop((0,0,350,150)),(95,90))
@@ -68,9 +78,9 @@ def assembly_diagram(help_data):
         image.paste(art.crop((320,0,660,150)),(415,90))
         for y in range(75,255,14):
             draw.line((415,y,415,y+7),fill='#333333',width=2)
-        draw.text((110,65),'A1: por baixo',font=font(19),fill=GREEN)
-        draw.text((480,65),'A2: por cima',font=font(19),fill=GREEN)
-        draw.text((75,280),'Tracejado = dobra para trás. Alinhe o desenho e fixe pelo verso.',font=font(22),fill=GREEN)
+        draw.text((110,65),'A1: por baixo',font=diagram_font(19),fill=GREEN)
+        draw.text((480,65),'A2: por cima',font=diagram_font(19),fill=GREEN)
+        draw.text((75,280),'Tracejado = dobra para trás. Alinhe o desenho e fixe pelo verso.',font=diagram_font(22),fill=GREEN)
     return image
 
 
@@ -123,6 +133,8 @@ class Desktop:
         style.configure('Title.TLabel', font=('Segoe UI', 25, 'bold'), foreground=GREEN)
         style.configure('Heading.TLabel', font=('Segoe UI', 13, 'bold'))
         style.configure('Hint.TLabel', font=('Segoe UI', 9), foreground='#62735f')
+        style.configure('Compact.TButton', padding=(6, 8))
+        style.configure('Compact.Primary.TButton', padding=(6, 8))
         style.configure('TNotebook', background='#eef3ec', borderwidth=0)
         style.configure('TNotebook.Tab', padding=(12, 10))
 
@@ -156,17 +168,23 @@ class Desktop:
         ttk.Label(header, text=f'Versão {VERSAO} · em teste', style='Hint.TLabel').pack(side='right')
         main = tk.Frame(self.root, bg='#eef3ec'); main.pack(fill='both', expand=True, padx=14, pady=10)
         side = ttk.Frame(main, width=340); side.pack(side='left', fill='y', padx=(0, 12)); side.pack_propagate(False)
+        # Reserve espaço para as ações antes de entregar a altura restante às abas.
+        footer = ttk.Frame(side, padding=(4, 8)); footer.pack(side='bottom', fill='x')
+        footer.columnconfigure((0, 1, 2), weight=1)
         self.steps = ttk.Notebook(side); self.steps.pack(fill='both', expand=True)
         self.image_page = ttk.Frame(self.steps, padding=14)
-        self.size_page = ttk.Frame(self.steps, padding=14)
+        self.size_page = ttk.Frame(self.steps)
         self.pdf_page = ttk.Frame(self.steps, padding=14)
         for page, title in ((self.image_page, 'Imagem'), (self.size_page, 'Folhas'), (self.pdf_page, 'Imprimir / PDF')):
             self.steps.add(page, text=title)
-        footer = ttk.Frame(side, padding=10); footer.pack(fill='x')
-        self.back_button = self.button(footer, 'Voltar', self.previous_step); self.back_button.pack(side='left')
-        self.next_button = self.button(footer, 'Continuar', self.next_step, True); self.next_button.pack(side='right')
+        self.back_button = self.button(footer, 'Voltar', self.previous_step)
+        self.next_button = self.button(footer, 'Continuar', self.next_step, True)
         self.export_button = self.button(footer, 'Salvar PDF', self.export_pdf)
         self.print_button = self.button(footer, 'Imprimir…', self.print_poster, True)
+        for button in (self.back_button, self.next_button, self.export_button, self.print_button):
+            button.configure(width=0, style="Compact." + button.cget("style"))
+        self.back_button.grid(row=0, column=0, sticky='w')
+        self.next_button.grid(row=0, column=2, sticky='e')
         self.steps.bind('<<NotebookTabChanged>>', self.step_changed)
         page = self.image_page
         ttk.Label(page, text='Escolha a imagem do pôster', style='Heading.TLabel', wraplength=285).pack(anchor='w', pady=(0, 12))
@@ -182,46 +200,49 @@ class Desktop:
         path_entry = ttk.Entry(self.path_panel, textvariable=self.path); path_entry.pack(fill='x')
         path_entry.bind('<Return>', lambda _event: self.open_path()); self.inputs.append(path_entry)
         self.button(self.path_panel, 'Abrir imagem', self.open_path).pack(fill='x', pady=6)
-        page = self.size_page
-        ttk.Label(page, text='Quantas folhas você quer usar?', style='Heading.TLabel', wraplength=285).pack(anchor='w', pady=(0, 10))
+        page = self.scrollable_size_page()
+        ttk.Label(page, text='Quantas folhas você quer usar?', style='Heading.TLabel', wraplength=285).pack(anchor='w', pady=(0, 6))
         self.size_mode = tk.StringVar(value='Por folhas (simples)')
         mode = ttk.Combobox(page, textvariable=self.size_mode, state='readonly', values=('Por folhas (simples)', 'Por medidas (mm)'))
-        mode.pack(fill='x', pady=(0, 8)); self.inputs.append(mode)
+        mode.pack(fill='x', pady=(0, 5)); self.inputs.append(mode)
         mode.bind('<<ComboboxSelected>>', lambda _event: self.size_mode_changed())
         self.sheet_fields = ttk.Frame(page); self.sheet_fields.pack(fill='x')
-        presets = ttk.Frame(self.sheet_fields); presets.pack(fill='x', pady=(0, 7))
-        for count, label in ((1, '1 folha'), (2, '4 folhas'), (3, '9 folhas')):
-            self.button(presets, label, lambda n=count: self.preset(n)).pack(side='left', expand=True, fill='x', padx=1)
+        presets = ttk.Frame(self.sheet_fields); presets.pack(fill='x', pady=(0, 4))
+        presets.columnconfigure((0, 1, 2), weight=1, uniform='folhas')
+        for column, (count, label) in enumerate(((1, '1 folha'), (2, '4 folhas'), (3, '9 folhas'))):
+            button = self.button(presets, label, lambda n=count: self.preset(n))
+            button.configure(width=0, style='Compact.TButton')
+            button.grid(row=0, column=column, sticky='ew', padx=1)
         fields = ttk.Frame(self.sheet_fields); fields.pack(fill='x')
         self.sheet_values = {}
         for row, (key, label) in enumerate((('colunas', 'Na horizontal'), ('linhas', 'Na vertical'))):
-            ttk.Label(fields, text=label).grid(row=row, column=0, sticky='w', pady=4)
+            ttk.Label(fields, text=label).grid(row=row, column=0, sticky='w', pady=2)
             value = tk.StringVar(value='2'); self.sheet_values[key] = value
             spin = ttk.Spinbox(fields, from_=1, to=400, width=7, textvariable=value)
-            spin.grid(row=row, column=1, padx=14, pady=4); self.inputs.append(spin)
+            spin.grid(row=row, column=1, padx=14, pady=2); self.inputs.append(spin)
             value.trace_add('write', lambda *_args: self.sheet_count_changed())
         self.sheet_summary = tk.StringVar(value='2 × 2 = 4 folhas A4')
-        ttk.Label(self.sheet_fields, textvariable=self.sheet_summary, style='Hint.TLabel').pack(anchor='w', pady=5)
+        ttk.Label(self.sheet_fields, textvariable=self.sheet_summary, style='Hint.TLabel').pack(anchor='w', pady=3)
         self.mm_fields = ttk.Frame(page); self.values = {}
         for row, (key, label) in enumerate((('largura_mm', 'Largura (mm)'), ('altura_mm', 'Altura (mm)'))):
-            ttk.Label(self.mm_fields, text=label).grid(row=row, column=0, sticky='w', pady=4)
+            ttk.Label(self.mm_fields, text=label).grid(row=row, column=0, sticky='w', pady=2)
             value = tk.StringVar(); self.values[key] = value
             entry = ttk.Entry(self.mm_fields, textvariable=value, width=10)
             entry.grid(row=row, column=1, padx=10, pady=4); entry.bind('<KeyRelease>', self.mark_dirty); self.inputs.append(entry)
         self.size_anchor = ttk.Frame(page); self.size_anchor.pack(fill='x')
-        ttk.Label(page, text='Posição das folhas A4', style='Hint.TLabel').pack(anchor='w', pady=(8, 4))
+        ttk.Label(page, text='Posição das folhas A4', style='Hint.TLabel').pack(anchor='w', pady=(4, 2))
         self.orientation = tk.StringVar(value='Em pé (retrato)')
         orientation = ttk.Combobox(page, textvariable=self.orientation, values=('Em pé (retrato)', 'Deitadas (paisagem)'), state='readonly')
         orientation.pack(fill='x'); orientation.bind('<<ComboboxSelected>>', lambda _event: self.orientation_changed()); self.inputs.append(orientation)
-        ttk.Label(page, text='Montagem sem recortar', style='Hint.TLabel').pack(anchor='w', pady=(8, 4))
+        ttk.Label(page, text='Montagem sem recortar', style='Hint.TLabel').pack(anchor='w', pady=(4, 2))
         self.assembly_mode = tk.StringVar(value='Dobrar bordas para trás')
         mode = ttk.Combobox(page, textvariable=self.assembly_mode,
                             values=('Dobrar bordas para trás', 'Folhas inteiras (faixas brancas)'), state='readonly')
         mode.pack(fill='x'); mode.bind('<<ComboboxSelected>>', lambda _event: self.orientation_changed()); self.inputs.append(mode)
         self.assembly_hint = tk.StringVar()
         self.assembly_hint_label = ttk.Label(page, textvariable=self.assembly_hint, style='Hint.TLabel', wraplength=285)
-        self.assembly_hint_label.pack(anchor='w', pady=4)
-        self.advanced_button = self.button(page, 'Ajustes de impressão…', self.toggle_advanced); self.advanced_button.pack(fill='x', pady=8)
+        self.assembly_hint_label.pack(anchor='w', pady=2)
+        self.advanced_button = self.button(page, 'Ajustes de impressão…', self.toggle_advanced); self.advanced_button.pack(fill='x', pady=4)
         self.advanced = ttk.Frame(page)
         for row, (key, label) in enumerate((('margem_mm', 'Borda branca (mm)'), ('sobreposicao_mm', 'Faixa para colar (mm)'))):
             ttk.Label(self.advanced, text=label).grid(row=row, column=0, sticky='w', pady=3)
@@ -231,8 +252,8 @@ class Desktop:
         self.marks = tk.BooleanVar(value=True)
         marks = ttk.Checkbutton(self.advanced, text='Guias de montagem e códigos das folhas', variable=self.marks, command=self.mark_dirty)
         marks.grid(row=2, column=0, columnspan=2, sticky='w', pady=6); self.inputs.append(marks)
-        self.apply_button = self.button(page, 'Atualizar prévia', self.configure_poster); self.apply_button.pack(fill='x')
-        ttk.Label(page, text='A imagem fica inteira, sem esticar.\nPode sobrar espaço branco.', style='Hint.TLabel', wraplength=285).pack(anchor='w', pady=8)
+        self.apply_button = self.button(page, 'Atualizar prévia', self.configure_poster); self.apply_button.pack(fill='x', before=self.advanced_button)
+        ttk.Label(page, text='A imagem fica inteira, sem esticar.\nPode sobrar espaço branco.', style='Hint.TLabel', wraplength=285).pack(anchor='w', pady=5)
         page = self.pdf_page
         ttk.Label(page, text='Imprima ou salve o PDF', style='Heading.TLabel', wraplength=285).pack(anchor='w', pady=(0, 12))
         self.pdf_summary = tk.StringVar(value='Escolha uma imagem antes de salvar.')
@@ -276,9 +297,16 @@ class Desktop:
         ttk.Label(self.help_tab, text='Como montar as folhas', style='Heading.TLabel').pack(anchor='w')
         self.help_config = ttk.Label(self.help_tab, text='', style='Hint.TLabel'); self.help_config.pack(anchor='w', pady=8)
         self.help_image = ttk.Label(self.help_tab); self.help_image.pack(fill='x')
-        self.help_text = tk.Text(self.help_tab, wrap='word', font=('Segoe UI',10), relief='flat', height=12, padx=10, pady=8)
-        self.help_text.pack(fill='both', expand=True, pady=8); self.help_text.configure(state='disabled')
-        self.button(self.help_tab, 'Voltar à prévia', lambda: self.submit('ajuda.montagem', {'exibir':False})).pack(anchor='e')
+        self.help_back = self.button(self.help_tab, 'Voltar à prévia', lambda: self.submit('ajuda.montagem', {'exibir':False}))
+        self.help_back.pack(side='bottom', anchor='e')
+        instructions = ttk.Frame(self.help_tab)
+        instructions.pack(fill='both', expand=True, pady=8)
+        scroll = ttk.Scrollbar(instructions, orient='vertical')
+        scroll.pack(side='right', fill='y')
+        self.help_text = tk.Text(instructions, wrap='word', font=('Segoe UI',10), relief='flat', height=12, padx=10, pady=8,
+                                 yscrollcommand=scroll.set, state='disabled')
+        scroll.configure(command=self.help_text.yview)
+        self.help_text.pack(fill='both', expand=True)
         ttk.Label(self.command_tab, text='Comandos para automação', style='Heading.TLabel').pack(anchor='w')
         ttk.Label(self.command_tab, text='Recurso técnico para scripts e assistentes de IA.', style='Hint.TLabel').pack(anchor='w', pady=6)
         self.request_text = tk.Text(self.command_tab, height=4, font=('Consolas',10), wrap='word'); self.request_text.pack(fill='x')
@@ -289,26 +317,53 @@ class Desktop:
         self.button(row,'Voltar à prévia',lambda:self.tabs.select(self.preview_tab)).pack(side='right')
         self.response_text = tk.Text(self.command_tab,font=('Consolas',9),wrap='word',bg='#f3f6ef',relief='flat',padx=10,pady=10)
         self.response_text.pack(fill='both',expand=True); self.response_text.configure(state='disabled')
+        self.button(self.about_tab,'Voltar à prévia',lambda:self.submit('programa.sobre',{'exibir':False})).pack(side='bottom', anchor='e')
         self.about_text = tk.Text(self.about_tab,wrap='word',font=('Segoe UI',11),relief='flat',padx=14,pady=12)
         self.about_text.pack(fill='both',expand=True)
         self.render_about(self.engine.execute({'comando':'programa.sobre'})['resultado'])
-        self.button(self.about_tab,'Voltar à prévia',lambda:self.submit('programa.sobre',{'exibir':False})).pack(anchor='e')
+
+    def scrollable_size_page(self):
+        # A barra aparece só quando a altura da aba não comporta todos os ajustes.
+        page = self.size_page
+        page.columnconfigure(0, weight=1)
+        page.rowconfigure(0, weight=1)
+        canvas = tk.Canvas(page, background='#ffffff', highlightthickness=0)
+        canvas.grid(row=0, column=0, sticky='nsew')
+        bar = ttk.Scrollbar(page, orient='vertical', command=canvas.yview)
+        canvas.configure(yscrollcommand=bar.set)
+        content = ttk.Frame(canvas, padding=(14, 10))
+        region = canvas.create_window(0, 0, anchor='nw', window=content)
+
+        def resize(_event=None):
+            width, height = canvas.winfo_width(), canvas.winfo_height()
+            content_height = content.winfo_reqheight()
+            canvas.itemconfigure(region, width=width)
+            canvas.configure(scrollregion=(0, 0, width, content_height))
+            if content_height > height:
+                bar.grid(row=0, column=1, sticky='ns')
+            else:
+                bar.grid_remove()
+                canvas.yview_moveto(0)
+
+        content.bind('<Configure>', resize)
+        canvas.bind('<Configure>', resize)
+        return content
 
     def step_changed(self, _event=None):
         if not hasattr(self, 'status'):
             return
         step = self.steps.index('current')
         self.back_button.configure(state='normal' if step > 0 and not self.busy else 'disabled')
-        self.next_button.pack_forget(); self.export_button.pack_forget(); self.print_button.pack_forget()
+        self.next_button.grid_remove(); self.export_button.grid_remove(); self.print_button.grid_remove()
         if step == 2:
-            self.print_button.pack(side='right')
-            self.export_button.pack(side='right', padx=(0, 6))
+            self.export_button.grid(row=0, column=1, sticky='e', padx=4)
+            self.print_button.grid(row=0, column=2, sticky='e')
             self.export_button.configure(state='normal' if self.engine.image is not None and not self.busy and not self.dirty else 'disabled')
             self.print_button.configure(state=self.export_button.cget('state'))
             if self.dirty:
                 self.status.set('Atualize a prévia na etapa Folhas antes de imprimir ou salvar o PDF.')
         else:
-            self.next_button.pack(side='right')
+            self.next_button.grid(row=0, column=2, sticky='e')
             self.next_button.configure(text='Continuar' if step == 1 else 'Continuar', state='normal' if self.engine.image is not None and not self.busy else 'disabled')
         if step > 0 and self.engine.image is None:
             self.status.set('Primeiro, escolha a imagem na aba Imagem.')
@@ -458,7 +513,7 @@ class Desktop:
             self.assembly_hint_label.pack(anchor='w', pady=4, before=self.advanced_button)
         else:
             self.assembly_hint_label.pack_forget()
-            self.advanced.pack(fill='x', before=self.apply_button)
+            self.advanced.pack(fill='x', after=self.advanced_button)
             self.advanced_button.configure(text='Ocultar ajustes de impressão')
 
     def mark_dirty(self, _event=None):

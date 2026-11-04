@@ -57,9 +57,9 @@ O capturador abre uma sessão nova com o cartaz sintético, escolhe as seis folh
 visita as abas e a ajuda e fecha somente a sessão criada por ele. Não usa imagens
 pessoais. Os arquivos ficam em `docs/img`.
 
-As fotos locais mostram o código 0.6.1 em teste, com o ícone de duas folhas,
-em Windows 11 virtual; o README distingue essa preparação da candidata
-0.6.1-rc.1 preparada para publicação. Capa e prévia social foram regeneradas com o ícone aprovado. A galeria inclui os dois modos.
+As fotos locais mostram o código 0.6.2 em teste, com a ajuda de montagem usando
+um trecho do mapa. A candidata publicada continua sendo a 0.6.1-rc.1; a correção
+0.6.2 ainda é local. Capa e prévia social foram regeneradas com o ícone aprovado. A galeria inclui os dois modos.
 A capa foi conferida no tamanho original, em miniatura (820 e 410 px) e sobre fundo escuro.
 A prévia social é o arquivo `capa-social.png`; seu envio nas configurações do
 repositório é uma ação separada.
@@ -78,3 +78,11 @@ Uma folha menor na origem da seta e uma maior no destino representam a ampliaç�
 A paleta e a seta anteriores foram mantidas. SVG/PNG/ICO são gerados por
 `native/gerar_icone.py`. O ícone entra também no recurso dos dois executáveis,
 que precisam ser recompilados quando o ICO mudar.
+
+
+## Ilustração da ajuda de montagem
+
+A ajuda usa um trecho do mapa Serra Clara, com trilha e curvas de nível, nos
+modos com dobra e folhas inteiras. As duas partes vêm do mesmo recorte, para
+mostrar continuidade; no modo inteiro ficam as margens brancas. O desenho é
+esquemático e sem escala. O nome de PDF nas capturas é mapa-serra-clara-A4.pdf.

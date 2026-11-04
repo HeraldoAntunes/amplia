@@ -12,6 +12,8 @@ Sucesso contém `ok:true`, `comando`, `versao`, `resultado` e o `id`, quando inf
 
 Falhas de abertura ou configuração mantêm o estado anterior. Arquivos são gravados por temporário e criação ou troca atômica, sem sobrescrever por padrão. A gravação dentro de original é recusada. Lotes param no primeiro erro; o protocolo --stdio continua para permitir correção pelo agente e termina com código de saída 1 se alguma requisição falhou.
 
+Na abertura, um arquivo ausente retorna `IMAGEM_NAO_ENCONTRADA`. Um caminho que aponta para pasta ou outro tipo que não é arquivo regular retorna `IMAGEM_NAO_E_ARQUIVO`. No Unix, nomes com bytes fora do UTF-8 retornam esses bytes como escapes JSON `\udcXX`, conforme a representação do sistema de arquivos em Python.
+
 ## Operações
 
 - **programa.sobre:** consulta nome, versão, licença, autoria, assistência de IA, privacidade e componentes, mesmo sem imagem. Na interface, exibir (padrão true) abre a aba Sobre; false volta à prévia. Não muda a sessão.

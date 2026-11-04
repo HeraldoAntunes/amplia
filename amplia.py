@@ -12,13 +12,14 @@ import math
 import os
 from pathlib import Path
 import secrets
+import stat
 import sys
 import tempfile
 import threading
 import warnings
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 
-from PIL import Image, ImageDraw, ImageFont, ImageOps, UnidentifiedImageError
+from PIL import Image, ImageDraw, ImageFont, ImageMath, ImageOps, UnidentifiedImageError
 from reportlab.lib.utils import ImageReader
 from reportlab.pdfgen import canvas
 
@@ -312,10 +313,18 @@ class Amplia:
             fail('ORIGEM_INVALIDA', 'Informe exatamente um de caminho ou dados_base64.')
         if 'caminho' in args:
             path = Path(args['caminho']).expanduser().resolve()
-            if path.stat().st_size > MAX_FILE:
-                fail('IMAGEM_GRANDE', 'Arquivo excede 40 MiB.')
-            with path.open('rb') as stream:
-                raw = stream.read(MAX_FILE + 1)
+            try:
+                metadata = path.stat()
+                if not stat.S_ISREG(metadata.st_mode):
+                    fail('IMAGEM_NAO_E_ARQUIVO', 'Escolha um arquivo de imagem.')
+                if metadata.st_size > MAX_FILE:
+                    fail('IMAGEM_GRANDE', 'Arquivo excede 40 MiB.')
+                with path.open('rb') as stream:
+                    raw = stream.read(MAX_FILE + 1)
+            except (FileNotFoundError, NotADirectoryError):
+                fail('IMAGEM_NAO_ENCONTRADA', 'O arquivo da imagem não foi encontrado.')
+            except IsADirectoryError:
+                fail('IMAGEM_NAO_E_ARQUIVO', 'Escolha um arquivo de imagem.')
             name = path.name
         else:
             if len(args['dados_base64']) > (MAX_FILE * 4 // 3 + 8):
@@ -337,7 +346,19 @@ class Amplia:
                         fail('IMAGEM_GRANDE', 'A imagem excede 40 milhões de pixels.')
                     image_format = source.format
                     frame_count = getattr(source, 'n_frames', 1)
-                    normalized = ImageOps.exif_transpose(source).convert('RGBA')
+                    oriented = ImageOps.exif_transpose(source)
+                    if oriented.mode in {'I;16', 'I;16L', 'I;16B', 'I;16N'}:
+                        # Converter direto satura amostras acima de 255. Mapeie a faixa
+                        # de 16 bits inteira e compare a transparência antes de arredondar.
+                        gray = oriented.convert('I')
+                        normalized = gray.point(lambda sample: sample / 257 + 0.5).convert('L').convert('RGBA')
+                        transparent = oriented.info.get('transparency')
+                        if isinstance(transparent, int):
+                            alpha = ImageMath.lambda_eval(
+                                lambda images: images['gray'] != transparent, gray=gray)
+                            normalized.putalpha(alpha.convert('L').point([0] + [255] * 255))
+                    else:
+                        normalized = oriented.convert('RGBA')
                     image = Image.new('RGB', normalized.size, 'white')
                     image.paste(normalized, mask=normalized.getchannel('A'))
         except (Image.DecompressionBombError, Image.DecompressionBombWarning):
@@ -740,7 +761,7 @@ class Handler(BaseHTTPRequestHandler):
                     response['resultado']['download_url'] = '/poster.pdf'
                 elif response['ok'] and request['comando'] in {'imagem.abrir', 'poster.configurar', 'sessao.reiniciar'}:
                     self.server.last_pdf = None
-            return self.send(200, json.dumps(response, ensure_ascii=False).encode('utf-8'))
+            return self.send(200, json.dumps(response, ensure_ascii=False).encode('utf-8', 'backslashreplace'))
         except (ValueError, UnicodeDecodeError):
             return self.send(400, b'{"ok":false,"erro":{"codigo":"JSON_INVALIDO"}}')
 
@@ -754,7 +775,9 @@ def main(argv=None):
     parser.add_argument('--port', type=int, default=8765)
     args = parser.parse_args(argv)
     if hasattr(sys.stdout, 'reconfigure'):
-        sys.stdout.reconfigure(encoding='utf-8')
+        # No Unix, nomes antigos podem conter bytes representados como surrogates.
+        # O escape JSON preserva esses bytes sem interromper a sessão.
+        sys.stdout.reconfigure(encoding='utf-8', errors='backslashreplace')
         sys.stdin.reconfigure(encoding='utf-8')
     if args.serve:
         (ROOT / 'output').mkdir(exist_ok=True)

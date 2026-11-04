@@ -8,7 +8,8 @@ decisões de produto e aceitação definidos pelo responsável pelo programa.
 ## Assistência de programação
 
 O código, os testes e a documentação foram desenvolvidos com assistência do
-Codex, da OpenAI. O assistente é ferramenta de desenvolvimento, não coautor.
+Codex, da OpenAI, e, a partir da 0.6.5, do Claude, da Anthropic. Os assistentes
+são ferramentas de desenvolvimento, não coautores.
 O uso de IA não significa revisão humana de todas as linhas nem certificação
 da qualidade, segurança ou titularidade do programa.
 

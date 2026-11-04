@@ -127,7 +127,8 @@ Veja o [contrato de comandos](COMANDOS.md).
 - **Há instalador?** Esta preparação oferece somente a pasta portátil.
 - **Procura atualizações?** Não há consulta automática. As candidatas estão no GitHub, no endereço informado no README.
 - **Funciona em outro sistema?** A validação automatizada usa Windows 11 em VM e Windows Server 2025 na CI;
-  Linux, macOS e outro computador físico continuam pendentes.
+  Para Linux pelo código-fonte, consulte os requisitos de Python e Tkinter no README.
+  macOS e outro computador físico continuam pendentes.
 - **A ampliação ficou borrada?** A qualidade depende da resolução da imagem.
   O comando de estado informa a resolução efetiva e avisos abaixo de 100 dpi.
 - **Posso fechar e retomar?** A sessão fica na memória; não há recuperação automática.

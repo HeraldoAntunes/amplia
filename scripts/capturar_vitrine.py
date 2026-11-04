@@ -1,5 +1,5 @@
 # Amplia · © 2026 Heraldo Antunes · SPDX-License-Identifier: MIT
-"""Fotografa uma sessão nova do aplicativo com o cartaz de demonstração próprio."""
+"""Fotografa uma sessão nova do aplicativo com o mapa de demonstração próprio."""
 import json
 import sys
 import time
@@ -34,18 +34,19 @@ def main():
         app._syncing=True;app.orientation.set('Deitadas (paisagem)')
         app.sheet_values['colunas'].set('3');app.sheet_values['linhas'].set('2');app._syncing=False
         app.configure_poster();wait()
-        app.output_folder.set('examples');app.output_name.set('geometria-A4.pdf')
+        app.output_folder.set('examples');app.output_name.set('mapa-serra-clara-A4.pdf')
         app.steps.select(0);capture('imagem')
         app.steps.select(1);capture('folhas');capture('capa-quadro')
         app.steps.select(2);capture('imprimir-pdf')
         app.view.current(2);app.change_view();wait();capture('folha-individual')
         app.submit('ajuda.montagem');wait();capture('montagem')
+        (out/'montagem-mapa.png').write_bytes((out/'montagem.png').read_bytes())
         app.submit('ajuda.montagem', {'exibir':False});wait()
         app.assembly_mode.set('Folhas inteiras (faixas brancas)');app.configure_poster();wait()
         app.steps.select(1);capture('folhas-inteiras')
         app.assembly_mode.set('Dobrar bordas para trás');app.configure_poster();wait()
         layout=app.engine.layout();assert layout['total_folhas']==6 and layout['papel_mm']==[297,210]
-        (ROOT/'output/vitrine-capturas.json').write_text(json.dumps({'versao':VERSAO,'janela_cliente':[root.winfo_width(),root.winfo_height()],'papel_mm':layout['papel_mm'],'poster_mm':layout['poster_mm'],'folhas':layout['total_folhas'],'origem':'Sessão real do aplicativo com cartaz próprio','dados_sinteticos':True},ensure_ascii=False,indent=2),encoding='utf-8')
+        (ROOT/'output/vitrine-capturas.json').write_text(json.dumps({'versao':VERSAO,'janela_cliente':[root.winfo_width(),root.winfo_height()],'papel_mm':layout['papel_mm'],'poster_mm':layout['poster_mm'],'folhas':layout['total_folhas'],'origem':'Sessão real do aplicativo com mapa fictício próprio','dados_sinteticos':True},ensure_ascii=False,indent=2),encoding='utf-8')
     finally:app.close(force=True)
 
 
