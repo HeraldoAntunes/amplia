@@ -1,7 +1,7 @@
 # Amplia · © 2026 Heraldo Antunes · SPDX-License-Identifier: MIT
 # Versões observadas nesta validação; revisar avisos de segurança antes de atualizar.
 Pillow==13.0.0
-reportlab==4.1.0
+reportlab==5.1.0
 chardet==7.4.3
 # Somente testes; não entram no aplicativo distribuído.
 pypdf==6.21.4
